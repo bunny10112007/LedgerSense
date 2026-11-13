@@ -1,0 +1,6 @@
+{
+  "file_hash": "c1ed9c0bca2eaca6cacba1878a1f47970e60aa7fda25ed41aee7894c9ac99c3e",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G14\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g14_deskcraft_furniture.png\", \"file_hash\": \"8f14e45fceea167a5a36dedd4bea2543\", \"vendor_name\": \"DeskCraft Furniture\", \"vendor_gstin\": \"29AAACD9012L1ZI\", \"vendor_key\": \"deskcraft-furniture|29AAACD9012L1ZI\", \"invoice_no\": \"INV-7710\", \"invoice_date\": \"2025-11-05\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"3500.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"630.00\", \"total\": \"4130.00\", \"line_items\": [{\"description\": \"Ergonomic mesh office work chair (IGST)\", \"quantity\": \"1\", \"unit_price\": \"3500.00\", \"amount\": \"3500.00\", \"hsn_sac\": \"9403\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

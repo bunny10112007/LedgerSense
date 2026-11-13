@@ -1,0 +1,6 @@
+{
+  "file_hash": "fad0bf9476b5b0626ab237dd06ab45f559e560db4bf3a72ad84ef680f22c5e9b",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G10\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g10_metro_print_house.png\", \"file_hash\": \"eccbc87e4b5ce2fe28308fd9f2a7baf3\", \"vendor_name\": \"Metro Print House\", \"vendor_gstin\": \"08AAAFM6789H1ZX\", \"vendor_key\": \"metro-print-house|08AAAFM6789H1ZX\", \"invoice_no\": \"INV-118\", \"invoice_date\": \"2025-12-02\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"20000.00\", \"cgst\": \"1800.00\", \"sgst\": \"1800.00\", \"igst\": \"0.00\", \"total\": \"23600.00\", \"line_items\": [{\"description\": \"Catalog printing, brochures and annual reports\", \"quantity\": \"1\", \"unit_price\": \"20000.00\", \"amount\": \"20000.00\", \"hsn_sac\": \"9989\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

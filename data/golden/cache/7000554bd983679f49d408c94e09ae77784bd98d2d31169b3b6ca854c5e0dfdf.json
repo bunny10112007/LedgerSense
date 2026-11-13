@@ -1,0 +1,6 @@
+{
+  "file_hash": "7000554bd983679f49d408c94e09ae77784bd98d2d31169b3b6ca854c5e0dfdf",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G13\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g13_local_tea_stall.png\", \"file_hash\": \"1679091c5a880faf6fb5e6087eb1b2dc\", \"vendor_name\": \"Local tea stall\", \"vendor_gstin\": null, \"vendor_key\": \"local-tea-stall|nogstin\", \"invoice_no\": null, \"invoice_date\": \"2025-12-18\", \"doc_type\": \"receipt\", \"payment_mode\": \"cash\", \"subtotal\": \"450.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"0.00\", \"total\": \"450.00\", \"line_items\": [{\"description\": \"Office refreshments, tea, coffee and snacks\", \"quantity\": \"1\", \"unit_price\": \"450.00\", \"amount\": \"450.00\", \"hsn_sac\": null, \"tax_rate_pct\": null}], \"field_confidence\": {\"invoice_date\": 0.9, \"total\": 0.92}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

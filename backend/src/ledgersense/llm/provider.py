@@ -20,8 +20,19 @@ class Provider(Protocol):
 
     model_id: str
 
-    def extract_receipt(self, image_bytes: bytes, mime: str, hints: dict[str, Any] | None = None) -> RawExtraction:
+    def extract_receipt(
+        self,
+        image_bytes: bytes,
+        mime: str = "image/png",
+        hints: dict[str, Any] | None = None,
+        error_feedback: str | None = None,
+    ) -> RawExtraction:
         ...
 
-    def structure_text(self, masked_text: str, hints: dict[str, Any] | None = None) -> RawExtraction:
+    def structure_text(
+        self,
+        masked_text: str,
+        hints: dict[str, Any] | None = None,
+        error_feedback: str | None = None,
+    ) -> RawExtraction:
         ...

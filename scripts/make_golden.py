@@ -6,6 +6,7 @@ matching Section 10 of the LedgerSense Complete Engineering Blueprint.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from pathlib import Path
 
@@ -227,6 +228,9 @@ def main() -> None:
         "rcpt:G15b": "g15b.png",
     }
 
+    cache_dir = golden_dir / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
     print(f"Generating 16 receipt images in {receipts_dir}...")
     for receipt in expected_receipts:
         rcpt_id = receipt["id"]
@@ -234,6 +238,22 @@ def main() -> None:
         out_file = receipts_dir / fname
         render_receipt_image(receipt, out_file)
         print(f"  [OK] Rendered {fname} ({receipt['vendor_name']} - INR {receipt['total']})")
+
+        # Cache fixture for replay mode
+        img_bytes = out_file.read_bytes()
+        file_hash = hashlib.sha256(img_bytes).hexdigest()
+        cache_file = cache_dir / f"{file_hash}.json"
+        with open(cache_file, "w", encoding="utf-8") as cf:
+            json.dump(
+                {
+                    "file_hash": file_hash,
+                    "model_id": "moonshot-v1-8k-vision-preview",
+                    "prompt_version": "v1",
+                    "response_json": json.dumps(receipt),
+                },
+                cf,
+                indent=2,
+            )
 
     bank_csv_path = golden_dir / "bank.csv"
     print(f"\nGenerating {bank_csv_path}...")

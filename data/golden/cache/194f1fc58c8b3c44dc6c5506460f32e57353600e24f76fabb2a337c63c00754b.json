@@ -1,0 +1,6 @@
+{
+  "file_hash": "194f1fc58c8b3c44dc6c5506460f32e57353600e24f76fabb2a337c63c00754b",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G11\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g11_bharat_life.png\", \"file_hash\": \"a87ff679a2f3e71d9181a67b7542122c\", \"vendor_name\": \"Bharat Life Insurance\", \"vendor_gstin\": null, \"vendor_key\": \"bharat-life-insurance|nogstin\", \"invoice_no\": \"BLI-99231\", \"invoice_date\": \"2026-01-15\", \"doc_type\": \"premium_receipt\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"30000.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"0.00\", \"total\": \"30000.00\", \"line_items\": [{\"description\": \"Term life insurance premium policy annual\", \"quantity\": \"1\", \"unit_price\": \"30000.00\", \"amount\": \"30000.00\", \"hsn_sac\": \"997132\", \"tax_rate_pct\": \"0.00\"}], \"field_confidence\": {\"invoice_date\": 0.99, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

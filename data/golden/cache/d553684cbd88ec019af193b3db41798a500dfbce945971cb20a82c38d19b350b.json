@@ -1,0 +1,6 @@
+{
+  "file_hash": "d553684cbd88ec019af193b3db41798a500dfbce945971cb20a82c38d19b350b",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G08\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g08_shield_health_feb.png\", \"file_hash\": \"202cb962ac59075b964b07152d234b70\", \"vendor_name\": \"Shield Health Insurance\", \"vendor_gstin\": \"27AAACS5678G1Z2\", \"vendor_key\": \"shield-health-insurance|27AAACS5678G1Z2\", \"invoice_no\": \"SHI-6512\", \"invoice_date\": \"2026-02-10\", \"doc_type\": \"premium_receipt\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"18000.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"0.00\", \"total\": \"18000.00\", \"line_items\": [{\"description\": \"Family medical insurance policy premium\", \"quantity\": \"1\", \"unit_price\": \"18000.00\", \"amount\": \"18000.00\", \"hsn_sac\": \"997133\", \"tax_rate_pct\": \"0.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.99, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}
