@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import httpx
@@ -114,9 +115,9 @@ def test_cache_miss_in_replay_mode_raises_error(monkeypatch: pytest.MonkeyPatch)
     assert "Cache miss in replay mode" in str(exc_info.value)
 
 
-def test_cache_hit_returns_stored_data(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_cache_hit_returns_stored_data(tmp_path: Path) -> None:
     """ExtractionCache returns stored data from DB or filesystem."""
-    cache = ExtractionCache()
+    cache = ExtractionCache(cache_dir=tmp_path)
     sample_bytes = b"known-document-bytes-sample"
     sample_json = json.dumps({"doc_type": "gst_invoice", "vendor_name": "Test Vendor", "total": "500.00"})
 

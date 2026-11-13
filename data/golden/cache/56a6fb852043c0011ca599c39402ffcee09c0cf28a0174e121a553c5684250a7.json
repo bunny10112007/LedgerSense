@@ -1,6 +1,0 @@
-{
-  "file_hash": "56a6fb852043c0011ca599c39402ffcee09c0cf28a0174e121a553c5684250a7",
-  "model_id": "moonshot-v1-8k-vision-preview",
-  "prompt_version": "v1",
-  "response_json": "{\"doc_type\": \"gst_invoice\", \"vendor_name\": \"Test Vendor\", \"total\": \"500.00\"}"
-}
