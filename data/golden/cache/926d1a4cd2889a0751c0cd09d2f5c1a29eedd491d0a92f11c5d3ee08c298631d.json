@@ -1,0 +1,6 @@
+{
+  "file_hash": "926d1a4cd2889a0751c0cd09d2f5c1a29eedd491d0a92f11c5d3ee08c298631d",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G03\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g03_cloudnimbus.png\", \"file_hash\": \"7d793037a0760186574b0282f2f435e7\", \"vendor_name\": \"CloudNimbus Software\", \"vendor_gstin\": \"29AABCC2345D1Z1\", \"vendor_key\": \"cloudnimbus-software|29AABCC2345D1Z1\", \"invoice_no\": \"CN-2025-881\", \"invoice_date\": \"2025-08-01\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"5000.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"900.00\", \"total\": \"5900.00\", \"line_items\": [{\"description\": \"Cloud hosting subscription (IGST)\", \"quantity\": \"1\", \"unit_price\": \"5000.00\", \"amount\": \"5000.00\", \"hsn_sac\": \"998315\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.99, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

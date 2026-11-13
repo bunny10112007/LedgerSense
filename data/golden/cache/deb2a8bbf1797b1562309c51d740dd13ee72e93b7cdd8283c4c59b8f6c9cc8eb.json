@@ -1,0 +1,6 @@
+{
+  "file_hash": "deb2a8bbf1797b1562309c51d740dd13ee72e93b7cdd8283c4c59b8f6c9cc8eb",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G12\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g12_sunrise_auto.png\", \"file_hash\": \"e4da3b7fbbce2345d7772b0674a318d5\", \"vendor_name\": \"Sunrise Auto Care\", \"vendor_gstin\": \"08AAAFS8901K1ZZ\", \"vendor_key\": \"sunrise-auto-care|08AAAFS8901K1ZZ\", \"invoice_no\": \"INV-3307\", \"invoice_date\": \"2026-01-22\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"upi\", \"subtotal\": \"5000.00\", \"cgst\": \"450.00\", \"sgst\": \"450.00\", \"igst\": \"0.00\", \"total\": \"5900.00\", \"line_items\": [{\"description\": \"Car service routine maintenance and spare parts passenger motor vehicle\", \"quantity\": \"1\", \"unit_price\": \"5000.00\", \"amount\": \"5000.00\", \"hsn_sac\": \"998729\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

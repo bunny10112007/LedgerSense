@@ -1,0 +1,6 @@
+{
+  "file_hash": "8b359ef451360f8cf1afaae39d341013c4b30606eee8c1b702e13cee759b8d05",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G07\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g07_shield_health_apr.png\", \"file_hash\": \"4a7d1ed414474e4033ac29ccb8653d9b\", \"vendor_name\": \"Shield Health Insurance\", \"vendor_gstin\": \"27AAACS5678G1Z2\", \"vendor_key\": \"shield-health-insurance|27AAACS5678G1Z2\", \"invoice_no\": \"SHI-8801\", \"invoice_date\": \"2026-04-12\", \"doc_type\": \"premium_receipt\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"24000.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"0.00\", \"total\": \"24000.00\", \"line_items\": [{\"description\": \"Health insurance premium annual policy (FY 2026-27)\", \"quantity\": \"1\", \"unit_price\": \"24000.00\", \"amount\": \"24000.00\", \"hsn_sac\": \"997133\", \"tax_rate_pct\": \"0.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.99, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

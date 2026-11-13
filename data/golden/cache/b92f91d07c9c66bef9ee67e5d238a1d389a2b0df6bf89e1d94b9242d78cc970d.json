@@ -1,0 +1,6 @@
+{
+  "file_hash": "b92f91d07c9c66bef9ee67e5d238a1d389a2b0df6bf89e1d94b9242d78cc970d",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G06\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g06_quickcab_duplicate.png\", \"file_hash\": \"d67c5cbf5b01c9f91932e3b8def5e9f8\", \"vendor_name\": \"QuickCab Mobility\", \"vendor_gstin\": \"08AAACQ4567F1ZC\", \"vendor_key\": \"quickcab-mobility|08AAACQ4567F1ZC\", \"invoice_no\": \"RCP-5529\", \"invoice_date\": \"2025-10-06\", \"doc_type\": \"fare\", \"payment_mode\": \"upi\", \"subtotal\": \"609.52\", \"cgst\": \"15.24\", \"sgst\": \"15.24\", \"igst\": \"0.00\", \"total\": \"640.00\", \"line_items\": [{\"description\": \"Local city cab fare trip (re-upload)\", \"quantity\": \"1\", \"unit_price\": \"609.52\", \"amount\": \"609.52\", \"hsn_sac\": \"996412\", \"tax_rate_pct\": \"5.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.99, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

@@ -1,0 +1,6 @@
+{
+  "file_hash": "bb9a0dfd4200b9f21e8611b1feba8bad215952e6e283ca8f916fbd53646eb9b7",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G04\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g04_spice_route.png\", \"file_hash\": \"1f3870be274f6c49b3e31a0c6728957f\", \"vendor_name\": \"Spice Route Restaurant\", \"vendor_gstin\": \"08AABFS3456E1ZB\", \"vendor_key\": \"spice-route-restaurant|08AABFS3456E1ZB\", \"invoice_no\": \"SR-4402\", \"invoice_date\": \"2025-09-14\", \"doc_type\": \"dining_bill\", \"payment_mode\": \"card\", \"subtotal\": \"2000.00\", \"cgst\": \"50.00\", \"sgst\": \"50.00\", \"igst\": \"0.00\", \"total\": \"2100.00\", \"line_items\": [{\"description\": \"Client dining and restaurant meals\", \"quantity\": \"1\", \"unit_price\": \"2000.00\", \"amount\": \"2000.00\", \"hsn_sac\": \"996331\", \"tax_rate_pct\": \"5.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.97, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

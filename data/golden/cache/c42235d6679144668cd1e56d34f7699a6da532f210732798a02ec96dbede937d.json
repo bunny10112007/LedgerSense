@@ -1,0 +1,6 @@
+{
+  "file_hash": "c42235d6679144668cd1e56d34f7699a6da532f210732798a02ec96dbede937d",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G09\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g09_rajputana_hardware.png\", \"file_hash\": \"c81e728d9d4c2f636f067f89cc14862c\", \"vendor_name\": \"Rajputana Hardware\", \"vendor_gstin\": null, \"vendor_key\": \"rajputana-hardware|nogstin\", \"invoice_no\": \"RH-1092\", \"invoice_date\": \"2025-11-20\", \"doc_type\": \"receipt\", \"payment_mode\": \"cash\", \"subtotal\": \"12000.00\", \"cgst\": \"0.00\", \"sgst\": \"0.00\", \"igst\": \"0.00\", \"total\": \"12000.00\", \"line_items\": [{\"description\": \"Office workshop hardware and electrical fixtures\", \"quantity\": \"1\", \"unit_price\": \"12000.00\", \"amount\": \"12000.00\", \"hsn_sac\": null, \"tax_rate_pct\": null}], \"field_confidence\": {\"invoice_date\": 0.95, \"total\": 0.98}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

@@ -1,0 +1,6 @@
+{
+  "file_hash": "6ef5388dfa903df7acec5011dab90cb3b38ad26634e562c64460d1134dffbae7",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G15b\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g15b_aravali_inv2105.png\", \"file_hash\": \"45c48cce2e2d7fbdea1afc51c7c6ad26\", \"vendor_name\": \"Aravali Stationers\", \"vendor_gstin\": \"08AAAFA1234B1ZC\", \"vendor_key\": \"aravali-stationers|08AAAFA1234B1ZC\", \"invoice_no\": \"INV-2105\", \"invoice_date\": \"2025-12-05\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"bank_transfer\", \"subtotal\": \"6000.00\", \"cgst\": \"540.00\", \"sgst\": \"540.00\", \"igst\": \"0.00\", \"total\": \"7080.00\", \"line_items\": [{\"description\": \"Printer ink toner cartridges batch B\", \"quantity\": \"1\", \"unit_price\": \"6000.00\", \"amount\": \"6000.00\", \"hsn_sac\": \"8443\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}

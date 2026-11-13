@@ -1,0 +1,6 @@
+{
+  "file_hash": "3efac6ca2675e5274441be0f415eee46f697c4d39acf00be4dfb7fbafb1fbb2f",
+  "model_id": "moonshot-v1-8k-vision-preview",
+  "prompt_version": "v1",
+  "response_json": "{\"id\": \"rcpt:G01\", \"run_id\": \"run:2025-26-demo\", \"source_file\": \"receipts/g01_invoice_2041.png\", \"file_hash\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\", \"vendor_name\": \"Aravali Stationers\", \"vendor_gstin\": \"08AAAFA1234B1ZC\", \"vendor_key\": \"aravali-stationers|08AAAFA1234B1ZC\", \"invoice_no\": \"INV-2041\", \"invoice_date\": \"2025-06-12\", \"doc_type\": \"gst_invoice\", \"payment_mode\": \"upi\", \"subtotal\": \"10000.00\", \"cgst\": \"900.00\", \"sgst\": \"900.00\", \"igst\": \"0.00\", \"total\": \"11800.00\", \"line_items\": [{\"description\": \"Office stationery and printing paper\", \"quantity\": \"1\", \"unit_price\": \"10000.00\", \"amount\": \"10000.00\", \"hsn_sac\": \"4817\", \"tax_rate_pct\": \"18.00\"}], \"field_confidence\": {\"vendor_gstin\": 0.99, \"invoice_date\": 0.98, \"total\": 0.99}, \"extraction_status\": \"OK\", \"check_messages\": []}"
+}
