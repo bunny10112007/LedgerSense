@@ -1,0 +1,285 @@
+{
+  "summary": {
+    "total_documents": 16,
+    "period_start": "2025-04-01",
+    "period_end": "2026-03-31",
+    "regime": "ITA_1961",
+    "exact_duplicates_count": 1,
+    "matched_pairs_count": 13,
+    "cash_receipts_count": 2,
+    "unmatched_bank_debits_count": 1,
+    "total_flags_count": 7,
+    "high_flags_count": 4,
+    "medium_flags_count": 3
+  },
+  "exact_duplicates": [
+    {
+      "receipt_id": "rcpt:G06",
+      "code": "G06",
+      "duplicate_of": "rcpt:G05",
+      "reason": "Exact duplicate of G05 cab fare (same vendor, amount 640.00, date 2025-10-06, invoice RCP-5529). Excluded from bank matching."
+    }
+  ],
+  "matched_pairs": [
+    {
+      "receipt_id": "rcpt:G01",
+      "code": "G01",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-06-12",
+      "bank_date": "2025-06-12",
+      "amount": "11800.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G02",
+      "code": "G02",
+      "doc_type": "fuel_slip",
+      "receipt_date": "2025-07-03",
+      "bank_date": "2025-07-04",
+      "amount": "3200.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 1,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G03",
+      "code": "G03",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-08-01",
+      "bank_date": "2025-08-01",
+      "amount": "5900.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G04",
+      "code": "G04",
+      "doc_type": "dining_bill",
+      "receipt_date": "2025-09-14",
+      "bank_date": "2025-09-14",
+      "amount": "2100.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G05",
+      "code": "G05",
+      "doc_type": "fare",
+      "receipt_date": "2025-10-06",
+      "bank_date": "2025-10-06",
+      "amount": "640.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G07",
+      "code": "G07",
+      "doc_type": "premium_receipt",
+      "receipt_date": "2026-04-12",
+      "bank_date": "2026-04-13",
+      "amount": "24000.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 1,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G08",
+      "code": "G08",
+      "doc_type": "premium_receipt",
+      "receipt_date": "2026-02-10",
+      "bank_date": "2026-02-10",
+      "amount": "18000.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G10",
+      "code": "G10",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-12-02",
+      "bank_date": "2025-12-02",
+      "amount": "23600.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G11",
+      "code": "G11",
+      "doc_type": "premium_receipt",
+      "receipt_date": "2026-01-15",
+      "bank_date": "2026-01-15",
+      "amount": "30000.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G12",
+      "code": "G12",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2026-01-22",
+      "bank_date": "2026-01-22",
+      "amount": "5900.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 0,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G14",
+      "code": "G14",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-11-05",
+      "bank_date": "2025-11-08",
+      "amount": "4130.00",
+      "bank_amount": "4128.00",
+      "amount_delta": "-2.00",
+      "date_delta_days": 3,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G15a",
+      "code": "G15a",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-12-03",
+      "bank_date": "2025-12-04",
+      "amount": "7080.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 1,
+      "kind": "MATCHED"
+    },
+    {
+      "receipt_id": "rcpt:G15b",
+      "code": "G15b",
+      "doc_type": "gst_invoice",
+      "receipt_date": "2025-12-05",
+      "bank_date": "2025-12-06",
+      "amount": "7080.00",
+      "amount_delta": "0.00",
+      "date_delta_days": 1,
+      "kind": "MATCHED"
+    }
+  ],
+  "cash_receipts": [
+    {
+      "receipt_id": "rcpt:G09",
+      "code": "G09",
+      "amount": "12000.00",
+      "date": "2025-11-20",
+      "expected_outcome": "CASH_LIMIT (HIGH); no bank line expected"
+    },
+    {
+      "receipt_id": "rcpt:G13",
+      "code": "G13",
+      "amount": "450.00",
+      "date": "2025-12-18",
+      "expected_outcome": "No flag (cash, under limit)"
+    }
+  ],
+  "unmatched_bank_debits": [
+    {
+      "id": "bank:unmatched:01",
+      "txn_date": "2026-03-05",
+      "narration": "UPI/UNKNOWN PAYEE",
+      "debit": "9999.00",
+      "credit": "0.00",
+      "expected_outcome": "UNMATCHED_BANK (MEDIUM)"
+    }
+  ],
+  "expected_flags": [
+    {
+      "rule_id": "DUP_FARE",
+      "severity": "HIGH",
+      "entity_ids": ["rcpt:G06"],
+      "code": "G06",
+      "suggested_action": "Reject the later document",
+      "description": "Exact duplicate of G05 fare receipt"
+    },
+    {
+      "rule_id": "OUT_OF_PERIOD",
+      "severity": "HIGH",
+      "entity_ids": ["rcpt:G07"],
+      "code": "G07",
+      "suggested_action": "Move to correct period or approve with reason",
+      "description": "Invoice date 2026-04-12 falls after period end 2026-03-31"
+    },
+    {
+      "rule_id": "CASH_LIMIT",
+      "severity": "HIGH",
+      "entity_ids": ["rcpt:G09"],
+      "code": "G09",
+      "suggested_action": "Treat as disallowed or obtain evidence of exception",
+      "description": "Cash expense 12000.00 exceeds statutory limit 10000.00"
+    },
+    {
+      "rule_id": "GSTIN_INVALID",
+      "severity": "HIGH",
+      "entity_ids": ["rcpt:G10"],
+      "code": "G10",
+      "suggested_action": "Deny ITC until corrected",
+      "description": "GSTIN 08AAAFM6789H1ZX has bad check character"
+    },
+    {
+      "rule_id": "ITC_BLOCKED",
+      "severity": "MEDIUM",
+      "entity_ids": ["rcpt:G04"],
+      "code": "G04",
+      "suggested_action": "Book tax as expense; ITC = 0",
+      "description": "Blocked ITC under CGST Act s.17(5)(b) for food and dining"
+    },
+    {
+      "rule_id": "ITC_BLOCKED",
+      "severity": "MEDIUM",
+      "entity_ids": ["rcpt:G12"],
+      "code": "G12",
+      "suggested_action": "Book tax as expense; ITC = 0",
+      "description": "Blocked ITC under CGST Act s.17(5)(a) for motor vehicle car service"
+    },
+    {
+      "rule_id": "UNMATCHED_BANK",
+      "severity": "MEDIUM",
+      "entity_ids": ["bank:9999"],
+      "suggested_action": "Obtain document or classify",
+      "description": "Bank debit 9999.00 on 2026-03-05 has no matching receipt"
+    }
+  ],
+  "commit_gate": {
+    "before_decision": {
+      "http_status": 409,
+      "blocking_high_flags": ["DUP_FARE", "OUT_OF_PERIOD", "CASH_LIMIT", "GSTIN_INVALID"],
+      "blocking_receipt_ids": ["rcpt:G06", "rcpt:G07", "rcpt:G09", "rcpt:G10"]
+    },
+    "after_all_resolved": {
+      "http_status": 200
+    }
+  },
+  "deductions": {
+    "80C": {
+      "claimed": "30000.00",
+      "allowed": "30000.00",
+      "excess": "0.00",
+      "source_receipt_id": "rcpt:G11",
+      "cap": "150000.00"
+    },
+    "80D_if_g07_rejected": {
+      "claimed": "18000.00",
+      "allowed": "18000.00",
+      "excess": "0.00",
+      "source_receipt_id": "rcpt:G08",
+      "cap": "25000.00"
+    },
+    "80D_if_g07_approved": {
+      "claimed": "42000.00",
+      "allowed": "25000.00",
+      "excess": "17000.00",
+      "source_receipt_ids": ["rcpt:G08", "rcpt:G07"],
+      "cap": "25000.00"
+    }
+  }
+}
