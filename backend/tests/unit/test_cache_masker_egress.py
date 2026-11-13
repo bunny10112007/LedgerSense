@@ -148,6 +148,41 @@ def test_cache_hit_returns_stored_data(monkeypatch: pytest.MonkeyPatch) -> None:
         assert hit.model_id == "moonshot-v1-8k-vision-preview"
 
 
+def test_extractor_cache_hit_zero_network_calls() -> None:
+    """Cache hit returns stored RawExtraction with zero network calls to provider."""
+    mock_provider = MagicMock()
+    mock_provider.model_id = "moonshot-v1-8k-vision-preview"
+
+    mock_cache = MagicMock()
+    sample_json = json.dumps(
+        {
+            "doc_type": "gst_invoice",
+            "vendor_name": "Aravali Stationers",
+            "vendor_gstin": "08AAAFA1234B1ZC",
+            "total": "11800.00",
+            "payment_mode": "upi",
+        }
+    )
+    mock_cache.get.return_value = RawExtraction(
+        raw_json=sample_json,
+        prompt_version="v1",
+        model_id="moonshot-v1-8k-vision-preview",
+        latency_ms=0,
+    )
+
+    extractor = ReceiptExtractor(provider=mock_provider, cache=mock_cache)
+    test_bytes = b"already-cached-receipt-bytes"
+
+    with Session(engine) as session:
+        receipt = extractor.extract_document(test_bytes, source_file="cached.png", session=session)
+
+        # Zero network calls to provider
+        assert mock_provider.extract_receipt.call_count == 0
+        assert receipt.extraction_status == "OK"
+        assert receipt.vendor_name == "Aravali Stationers"
+        assert receipt.vendor_key == "aravali-stationers|08AAAFA1234B1ZC"
+
+
 def test_extractor_retry_loop_on_validation_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """On validation failure, extractor retries once with error feedback and succeeds if attempt 2 is valid."""
     monkeypatch.setattr(settings, "LLM_MODE", "live")
