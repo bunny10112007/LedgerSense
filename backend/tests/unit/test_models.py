@@ -5,15 +5,25 @@ import pytest
 from pydantic import ValidationError
 
 from ledgersense.domain.models import (
+    ALLOWED_TRANSITIONS,
+    ID_PREFIXES,
     AuditEvent,
     BankLine,
+    DeductionItem,
+    DeductionSchedule,
+    GstinResult,
+    ITRDraft,
     JournalEntry,
     JournalLine,
     LineItem,
     Match,
+    PnL,
     Receipt,
     RiskFlag,
+    Run,
     RunConfig,
+    TrialBalance,
+    TrialBalanceRow,
     quantize_money,
 )
 
@@ -155,3 +165,89 @@ def test_bank_line_and_match_instantiation():
     )
     assert match.kind == "MATCHED"
     assert match.amount_delta == Decimal("0.00")
+
+
+def test_run_model_and_allowed_transitions():
+    cfg = RunConfig(
+        period_start=date(2025, 4, 1),
+        period_end=date(2026, 3, 31),
+        cash_limit=Decimal("10000.00"),
+    )
+    run = Run(
+        id="run:2025-26-demo",
+        period_start=cfg.period_start,
+        period_end=cfg.period_end,
+        regime=cfg.regime,
+        status="CREATED",
+        config=cfg,
+    )
+    assert run.id == "run:2025-26-demo"
+    assert run.status == "CREATED"
+    assert run.regime == "ITA_1961"
+
+    # Test allowed transitions
+    assert "EXTRACTED" in ALLOWED_TRANSITIONS["CREATED"]
+    assert "FAILED" in ALLOWED_TRANSITIONS["CREATED"]
+    assert "COMMITTED" in ALLOWED_TRANSITIONS["APPROVED"]
+    assert len(ALLOWED_TRANSITIONS["COMMITTED"]) == 0
+    assert len(ALLOWED_TRANSITIONS["FAILED"]) == 0
+
+    # ID Prefixes
+    assert ID_PREFIXES["run"] == "run:"
+    assert ID_PREFIXES["receipt"] == "rcpt:"
+    assert ID_PREFIXES["bank"] == "bank:"
+
+
+def test_section_9_inter_module_models():
+    # 1. GstinResult
+    valid_gstin = GstinResult(ok=True)
+    invalid_gstin = GstinResult(ok=False, reason="bad checksum", expected_check_char="V")
+    assert valid_gstin.ok is True
+    assert invalid_gstin.expected_check_char == "V"
+
+    # 2. TrialBalance & Row
+    tb_row = TrialBalanceRow(account_code="BANK", debit=Decimal("0.00"), credit=Decimal("11800.00"))
+    tb = TrialBalance(
+        accounts=[tb_row],
+        total_debit=Decimal("11800.00"),
+        total_credit=Decimal("11800.00"),
+        balanced=True,
+    )
+    assert tb.balanced is True
+    assert len(tb.accounts) == 1
+
+    # 3. PnL
+    pnl = PnL(
+        income={"SALES": Decimal("50000.00")},
+        expenses={"OFFICE_SUPPLIES": Decimal("10000.00")},
+        total_income=Decimal("50000.00"),
+        total_expenses=Decimal("10000.00"),
+        net_profit=Decimal("40000.00"),
+    )
+    assert pnl.net_profit == Decimal("40000.00")
+
+    # 4. DeductionItem & DeductionSchedule
+    item_80c = DeductionItem(
+        section="80C",
+        legal_ref="s.80C",
+        claimed=Decimal("30000.00"),
+        cap=Decimal("150000.00"),
+        allowed=Decimal("30000.00"),
+        excess=Decimal("0.00"),
+    )
+    schedule = DeductionSchedule(
+        regime="ITA_1961",
+        tax_regime_choice="old",
+        items=[item_80c],
+        notes=["Draft schedule under old tax regime."],
+    )
+    assert schedule.items[0].allowed == Decimal("30000.00")
+
+    # 5. ITRDraft
+    itr = ITRDraft(
+        form="ITR-3",
+        regime="ITA_1961",
+        payload={"schedule_bp": {"gross_profit": "40000.00"}},
+    )
+    assert itr.form == "ITR-3"
+    assert itr.field_mapping_ref == "field_mapping.csv"
