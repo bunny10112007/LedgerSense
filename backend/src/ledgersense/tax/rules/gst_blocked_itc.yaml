@@ -1,0 +1,18 @@
+version: 1
+verified_by: null # fill with CA name + date; UI shows "UNVERIFIED" until set
+categories:
+  - id: FOOD_BEVERAGE
+    ref: "CGST Act s.17(5)(b)"
+    keywords: [restaurant, catering, canteen, food, beverage, dining]
+    action: BLOCK_ITC
+    severity: MEDIUM
+  - id: MOTOR_VEHICLE
+    ref: "CGST Act s.17(5)(a)"
+    keywords: [car service, car repair, motor vehicle, spare parts passenger]
+    action: BLOCK_ITC_NEEDS_CONFIRMATION
+    severity: MEDIUM
+  - id: HEALTH_CLUB
+    ref: "CGST Act s.17(5)(b)"
+    keywords: [gym, club membership, health club]
+    action: BLOCK_ITC
+    severity: MEDIUM

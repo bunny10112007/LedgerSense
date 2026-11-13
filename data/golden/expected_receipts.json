@@ -1,0 +1,559 @@
+[
+  {
+    "id": "rcpt:G01",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g01_invoice_2041.png",
+    "file_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor_name": "Aravali Stationers",
+    "vendor_gstin": "08AAAFA1234B1ZC",
+    "vendor_key": "aravali-stationers|08AAAFA1234B1ZC",
+    "invoice_no": "INV-2041",
+    "invoice_date": "2025-06-12",
+    "doc_type": "gst_invoice",
+    "payment_mode": "upi",
+    "subtotal": "10000.00",
+    "cgst": "900.00",
+    "sgst": "900.00",
+    "igst": "0.00",
+    "total": "11800.00",
+    "line_items": [
+      {
+        "description": "Office stationery and printing paper",
+        "quantity": "1",
+        "unit_price": "10000.00",
+        "amount": "10000.00",
+        "hsn_sac": "4817",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G02",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g02_fuel_7781.png",
+    "file_hash": "5d41402abc4b2a76b9719d911017c592",
+    "vendor_name": "Pink City Fuels",
+    "vendor_gstin": "08AAACP5678C1ZD",
+    "vendor_key": "pink-city-fuels|08AAACP5678C1ZD",
+    "invoice_no": "7781",
+    "invoice_date": "2025-07-03",
+    "doc_type": "fuel_slip",
+    "payment_mode": "card",
+    "subtotal": "3200.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "3200.00",
+    "line_items": [
+      {
+        "description": "Diesel fuel",
+        "quantity": "35.5",
+        "unit_price": "90.14",
+        "amount": "3200.00",
+        "hsn_sac": "2710",
+        "tax_rate_pct": "0.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.98,
+      "invoice_date": 0.97,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G03",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g03_cloudnimbus.png",
+    "file_hash": "7d793037a0760186574b0282f2f435e7",
+    "vendor_name": "CloudNimbus Software",
+    "vendor_gstin": "29AABCC2345D1Z1",
+    "vendor_key": "cloudnimbus-software|29AABCC2345D1Z1",
+    "invoice_no": "CN-2025-881",
+    "invoice_date": "2025-08-01",
+    "doc_type": "gst_invoice",
+    "payment_mode": "bank_transfer",
+    "subtotal": "5000.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "900.00",
+    "total": "5900.00",
+    "line_items": [
+      {
+        "description": "Cloud hosting subscription (IGST)",
+        "quantity": "1",
+        "unit_price": "5000.00",
+        "amount": "5000.00",
+        "hsn_sac": "998315",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G04",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g04_spice_route.png",
+    "file_hash": "1f3870be274f6c49b3e31a0c6728957f",
+    "vendor_name": "Spice Route Restaurant",
+    "vendor_gstin": "08AABFS3456E1ZB",
+    "vendor_key": "spice-route-restaurant|08AABFS3456E1ZB",
+    "invoice_no": "SR-4402",
+    "invoice_date": "2025-09-14",
+    "doc_type": "dining_bill",
+    "payment_mode": "card",
+    "subtotal": "2000.00",
+    "cgst": "50.00",
+    "sgst": "50.00",
+    "igst": "0.00",
+    "total": "2100.00",
+    "line_items": [
+      {
+        "description": "Client dining and restaurant meals",
+        "quantity": "1",
+        "unit_price": "2000.00",
+        "amount": "2000.00",
+        "hsn_sac": "996331",
+        "tax_rate_pct": "5.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.97,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G05",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g05_quickcab.png",
+    "file_hash": "d67c5cbf5b01c9f91932e3b8def5e9f8",
+    "vendor_name": "QuickCab Mobility",
+    "vendor_gstin": "08AAACQ4567F1ZC",
+    "vendor_key": "quickcab-mobility|08AAACQ4567F1ZC",
+    "invoice_no": "RCP-5529",
+    "invoice_date": "2025-10-06",
+    "doc_type": "fare",
+    "payment_mode": "upi",
+    "subtotal": "609.52",
+    "cgst": "15.24",
+    "sgst": "15.24",
+    "igst": "0.00",
+    "total": "640.00",
+    "line_items": [
+      {
+        "description": "Local city cab fare trip",
+        "quantity": "1",
+        "unit_price": "609.52",
+        "amount": "609.52",
+        "hsn_sac": "996412",
+        "tax_rate_pct": "5.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G06",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g06_quickcab_duplicate.png",
+    "file_hash": "d67c5cbf5b01c9f91932e3b8def5e9f8",
+    "vendor_name": "QuickCab Mobility",
+    "vendor_gstin": "08AAACQ4567F1ZC",
+    "vendor_key": "quickcab-mobility|08AAACQ4567F1ZC",
+    "invoice_no": "RCP-5529",
+    "invoice_date": "2025-10-06",
+    "doc_type": "fare",
+    "payment_mode": "upi",
+    "subtotal": "609.52",
+    "cgst": "15.24",
+    "sgst": "15.24",
+    "igst": "0.00",
+    "total": "640.00",
+    "line_items": [
+      {
+        "description": "Local city cab fare trip (re-upload)",
+        "quantity": "1",
+        "unit_price": "609.52",
+        "amount": "609.52",
+        "hsn_sac": "996412",
+        "tax_rate_pct": "5.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G07",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g07_shield_health_apr.png",
+    "file_hash": "4a7d1ed414474e4033ac29ccb8653d9b",
+    "vendor_name": "Shield Health Insurance",
+    "vendor_gstin": "27AAACS5678G1Z2",
+    "vendor_key": "shield-health-insurance|27AAACS5678G1Z2",
+    "invoice_no": "SHI-8801",
+    "invoice_date": "2026-04-12",
+    "doc_type": "premium_receipt",
+    "payment_mode": "bank_transfer",
+    "subtotal": "24000.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "24000.00",
+    "line_items": [
+      {
+        "description": "Health insurance premium annual policy (FY 2026-27)",
+        "quantity": "1",
+        "unit_price": "24000.00",
+        "amount": "24000.00",
+        "hsn_sac": "997133",
+        "tax_rate_pct": "0.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G08",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g08_shield_health_feb.png",
+    "file_hash": "202cb962ac59075b964b07152d234b70",
+    "vendor_name": "Shield Health Insurance",
+    "vendor_gstin": "27AAACS5678G1Z2",
+    "vendor_key": "shield-health-insurance|27AAACS5678G1Z2",
+    "invoice_no": "SHI-6512",
+    "invoice_date": "2026-02-10",
+    "doc_type": "premium_receipt",
+    "payment_mode": "bank_transfer",
+    "subtotal": "18000.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "18000.00",
+    "line_items": [
+      {
+        "description": "Family medical insurance policy premium",
+        "quantity": "1",
+        "unit_price": "18000.00",
+        "amount": "18000.00",
+        "hsn_sac": "997133",
+        "tax_rate_pct": "0.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G09",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g09_rajputana_hardware.png",
+    "file_hash": "c81e728d9d4c2f636f067f89cc14862c",
+    "vendor_name": "Rajputana Hardware",
+    "vendor_gstin": null,
+    "vendor_key": "rajputana-hardware|nogstin",
+    "invoice_no": "RH-1092",
+    "invoice_date": "2025-11-20",
+    "doc_type": "receipt",
+    "payment_mode": "cash",
+    "subtotal": "12000.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "12000.00",
+    "line_items": [
+      {
+        "description": "Office workshop hardware and electrical fixtures",
+        "quantity": "1",
+        "unit_price": "12000.00",
+        "amount": "12000.00",
+        "hsn_sac": null,
+        "tax_rate_pct": null
+      }
+    ],
+    "field_confidence": {
+      "invoice_date": 0.95,
+      "total": 0.98
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G10",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g10_metro_print_house.png",
+    "file_hash": "eccbc87e4b5ce2fe28308fd9f2a7baf3",
+    "vendor_name": "Metro Print House",
+    "vendor_gstin": "08AAAFM6789H1ZX",
+    "vendor_key": "metro-print-house|08AAAFM6789H1ZX",
+    "invoice_no": "INV-118",
+    "invoice_date": "2025-12-02",
+    "doc_type": "gst_invoice",
+    "payment_mode": "bank_transfer",
+    "subtotal": "20000.00",
+    "cgst": "1800.00",
+    "sgst": "1800.00",
+    "igst": "0.00",
+    "total": "23600.00",
+    "line_items": [
+      {
+        "description": "Catalog printing, brochures and annual reports",
+        "quantity": "1",
+        "unit_price": "20000.00",
+        "amount": "20000.00",
+        "hsn_sac": "9989",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G11",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g11_bharat_life.png",
+    "file_hash": "a87ff679a2f3e71d9181a67b7542122c",
+    "vendor_name": "Bharat Life Insurance",
+    "vendor_gstin": null,
+    "vendor_key": "bharat-life-insurance|nogstin",
+    "invoice_no": "BLI-99231",
+    "invoice_date": "2026-01-15",
+    "doc_type": "premium_receipt",
+    "payment_mode": "bank_transfer",
+    "subtotal": "30000.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "30000.00",
+    "line_items": [
+      {
+        "description": "Term life insurance premium policy annual",
+        "quantity": "1",
+        "unit_price": "30000.00",
+        "amount": "30000.00",
+        "hsn_sac": "997132",
+        "tax_rate_pct": "0.00"
+      }
+    ],
+    "field_confidence": {
+      "invoice_date": 0.99,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G12",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g12_sunrise_auto.png",
+    "file_hash": "e4da3b7fbbce2345d7772b0674a318d5",
+    "vendor_name": "Sunrise Auto Care",
+    "vendor_gstin": "08AAAFS8901K1ZZ",
+    "vendor_key": "sunrise-auto-care|08AAAFS8901K1ZZ",
+    "invoice_no": "INV-3307",
+    "invoice_date": "2026-01-22",
+    "doc_type": "gst_invoice",
+    "payment_mode": "upi",
+    "subtotal": "5000.00",
+    "cgst": "450.00",
+    "sgst": "450.00",
+    "igst": "0.00",
+    "total": "5900.00",
+    "line_items": [
+      {
+        "description": "Car service routine maintenance and spare parts passenger motor vehicle",
+        "quantity": "1",
+        "unit_price": "5000.00",
+        "amount": "5000.00",
+        "hsn_sac": "998729",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G13",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g13_local_tea_stall.png",
+    "file_hash": "1679091c5a880faf6fb5e6087eb1b2dc",
+    "vendor_name": "Local tea stall",
+    "vendor_gstin": null,
+    "vendor_key": "local-tea-stall|nogstin",
+    "invoice_no": null,
+    "invoice_date": "2025-12-18",
+    "doc_type": "receipt",
+    "payment_mode": "cash",
+    "subtotal": "450.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "0.00",
+    "total": "450.00",
+    "line_items": [
+      {
+        "description": "Office refreshments, tea, coffee and snacks",
+        "quantity": "1",
+        "unit_price": "450.00",
+        "amount": "450.00",
+        "hsn_sac": null,
+        "tax_rate_pct": null
+      }
+    ],
+    "field_confidence": {
+      "invoice_date": 0.90,
+      "total": 0.92
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G14",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g14_deskcraft_furniture.png",
+    "file_hash": "8f14e45fceea167a5a36dedd4bea2543",
+    "vendor_name": "DeskCraft Furniture",
+    "vendor_gstin": "29AAACD9012L1ZI",
+    "vendor_key": "deskcraft-furniture|29AAACD9012L1ZI",
+    "invoice_no": "INV-7710",
+    "invoice_date": "2025-11-05",
+    "doc_type": "gst_invoice",
+    "payment_mode": "bank_transfer",
+    "subtotal": "3500.00",
+    "cgst": "0.00",
+    "sgst": "0.00",
+    "igst": "630.00",
+    "total": "4130.00",
+    "line_items": [
+      {
+        "description": "Ergonomic mesh office work chair (IGST)",
+        "quantity": "1",
+        "unit_price": "3500.00",
+        "amount": "3500.00",
+        "hsn_sac": "9403",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G15a",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g15a_aravali_inv2102.png",
+    "file_hash": "c9f0f895fb98ab9159f51fd0297e236d",
+    "vendor_name": "Aravali Stationers",
+    "vendor_gstin": "08AAAFA1234B1ZC",
+    "vendor_key": "aravali-stationers|08AAAFA1234B1ZC",
+    "invoice_no": "INV-2102",
+    "invoice_date": "2025-12-03",
+    "doc_type": "gst_invoice",
+    "payment_mode": "bank_transfer",
+    "subtotal": "6000.00",
+    "cgst": "540.00",
+    "sgst": "540.00",
+    "igst": "0.00",
+    "total": "7080.00",
+    "line_items": [
+      {
+        "description": "Printer ink toner cartridges batch A",
+        "quantity": "1",
+        "unit_price": "6000.00",
+        "amount": "6000.00",
+        "hsn_sac": "8443",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  },
+  {
+    "id": "rcpt:G15b",
+    "run_id": "run:2025-26-demo",
+    "source_file": "receipts/g15b_aravali_inv2105.png",
+    "file_hash": "45c48cce2e2d7fbdea1afc51c7c6ad26",
+    "vendor_name": "Aravali Stationers",
+    "vendor_gstin": "08AAAFA1234B1ZC",
+    "vendor_key": "aravali-stationers|08AAAFA1234B1ZC",
+    "invoice_no": "INV-2105",
+    "invoice_date": "2025-12-05",
+    "doc_type": "gst_invoice",
+    "payment_mode": "bank_transfer",
+    "subtotal": "6000.00",
+    "cgst": "540.00",
+    "sgst": "540.00",
+    "igst": "0.00",
+    "total": "7080.00",
+    "line_items": [
+      {
+        "description": "Printer ink toner cartridges batch B",
+        "quantity": "1",
+        "unit_price": "6000.00",
+        "amount": "6000.00",
+        "hsn_sac": "8443",
+        "tax_rate_pct": "18.00"
+      }
+    ],
+    "field_confidence": {
+      "vendor_gstin": 0.99,
+      "invoice_date": 0.98,
+      "total": 0.99
+    },
+    "extraction_status": "OK",
+    "check_messages": []
+  }
+]

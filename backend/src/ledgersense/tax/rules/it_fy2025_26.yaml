@@ -1,0 +1,20 @@
+version: 1
+financial_year: "2025-26"
+regime: ITA_1961
+verified_by: null
+cash_expense_limit:
+  amount: 10000 # per person per day; CONFIRM with CA
+  ref_1961: "s.40A(3)"
+  ref_2025: null # mapping pending
+  severity: HIGH
+deductions:
+  - id: 80C
+    cap: 150000
+    ref_1961: "s.80C"
+    ref_2025: "s.123"
+    old_regime_only: true
+  - id: 80D
+    cap_self_family: 25000 # CONFIRM caps, senior-citizen and parent limits
+    ref_1961: "s.80D"
+    ref_2025: "s.126"
+    old_regime_only: true
