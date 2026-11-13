@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
-import re
-from decimal import Decimal
-from typing import Any, Literal
+from pathlib import Path
+from typing import Any
 
 from openai import OpenAIError
 from pydantic import ValidationError
@@ -12,6 +11,11 @@ from sqlmodel import Session
 
 from ledgersense.core.config import settings
 from ledgersense.domain.models import ExtractedReceipt, Receipt
+from ledgersense.extraction.checks import (
+    evaluate_confidence_status,
+    run_arithmetic_checks,
+)
+from ledgersense.extraction.normalise import compute_vendor_key
 from ledgersense.llm.cache import CacheMissError, ExtractionCache
 from ledgersense.llm.egress import log_outbound_call
 from ledgersense.llm.kimi_provider import KimiProvider
@@ -20,35 +24,6 @@ from ledgersense.llm.prompts import PROMPT_VERSION
 from ledgersense.llm.provider import Provider, RawExtraction
 
 logger = logging.getLogger(__name__)
-
-
-def compute_vendor_key(vendor_name: str | None, vendor_gstin: str | None) -> str:
-    """Derive deterministic vendor_key from vendor_name and vendor_gstin (Section 6.1)."""
-    norm_name = re.sub(r"[^a-z0-9]+", "-", (vendor_name or "unknown").strip().lower()).strip("-")
-    norm_gstin = (vendor_gstin or "").strip().upper()
-    return f"{norm_name}|{norm_gstin}"
-
-
-def check_receipt_arithmetic(receipt: ExtractedReceipt) -> list[str]:
-    """Check arithmetic consistency of extracted subtotal, taxes, and total."""
-    messages: list[str] = []
-    if receipt.subtotal is not None and receipt.total is not None:
-        calc_total = receipt.subtotal + receipt.cgst + receipt.sgst + receipt.igst
-        if abs(calc_total - receipt.total) > Decimal("0.05"):
-            messages.append(
-                f"Arithmetic mismatch: subtotal ({receipt.subtotal}) + taxes ({receipt.cgst + receipt.sgst + receipt.igst}) "
-                f"= {calc_total} != total ({receipt.total})"
-            )
-    return messages
-
-
-def evaluate_confidence(receipt: ExtractedReceipt) -> Literal["OK", "LOW_CONFIDENCE"]:
-    """Evaluate field confidences for key fields (vendor_gstin, invoice_date, total)."""
-    for field in ("total", "invoice_date", "vendor_gstin"):
-        conf = receipt.field_confidence.get(field)
-        if conf is not None and conf < 0.70:
-            return "LOW_CONFIDENCE"
-    return "OK"
 
 
 def parse_extracted_receipt(raw_json: str) -> tuple[ExtractedReceipt | None, str | None]:
@@ -72,7 +47,10 @@ class ReceiptExtractor:
 
     def extract_document(
         self,
-        file_bytes: bytes,
+        path: Path | str | bytes | None = None,
+        file_bytes: bytes | None = None,
+        provider: Provider | None = None,
+        cache: ExtractionCache | None = None,
         mime: str = "image/png",
         run_id: str = "run:default",
         receipt_id: str | None = None,
@@ -80,17 +58,36 @@ class ReceiptExtractor:
         hints: dict[str, Any] | None = None,
         session: Session | None = None,
     ) -> Receipt:
-        """Extract receipt metadata from document bytes with cache lookup, egress logging, and validation retry."""
-        file_hash = ExtractionCache.compute_hash(file_bytes)
+        """Extract receipt metadata from document path or bytes with cache lookup, egress logging, and retry."""
+        active_provider = provider or self.provider
+        active_cache = cache or self.cache
+
+        # Resolve payload bytes
+        if path is not None:
+            if isinstance(path, (str, Path)):
+                path_obj = Path(path)
+                data_bytes = path_obj.read_bytes()
+                if source_file == "unknown":
+                    source_file = str(path)
+            elif isinstance(path, bytes):
+                data_bytes = path
+            else:
+                raise TypeError(f"Unsupported path type: {type(path)}")
+        elif file_bytes is not None:
+            data_bytes = file_bytes
+        else:
+            raise ValueError("Either path or file_bytes must be provided")
+
+        file_hash = ExtractionCache.compute_hash(data_bytes)
         rcpt_id = receipt_id or f"rcpt:{file_hash[:8]}"
 
         raw_extraction: RawExtraction | None = None
 
         # Step 1: Cache lookup
         try:
-            raw_extraction = self.cache.get(
-                file_bytes=file_bytes,
-                model_id=self.provider.model_id,
+            raw_extraction = active_cache.get(
+                file_bytes=data_bytes,
+                model_id=active_provider.model_id,
                 prompt_version=PROMPT_VERSION,
                 session=session,
             )
@@ -100,22 +97,22 @@ class ReceiptExtractor:
 
         # Step 2: Live extraction on cache miss
         if raw_extraction is None:
-            raw_extraction = self.provider.extract_receipt(
-                image_bytes=file_bytes,
+            raw_extraction = active_provider.extract_receipt(
+                image_bytes=data_bytes,
                 mime=mime,
                 hints=hints,
             )
             log_outbound_call(
                 file_hash=file_hash,
-                payload_bytes=file_bytes,
-                model_id=self.provider.model_id,
+                payload_bytes=data_bytes,
+                model_id=active_provider.model_id,
                 masked=False,
                 run_id=run_id,
                 session=session,
             )
-            self.cache.put(
-                file_bytes=file_bytes,
-                model_id=self.provider.model_id,
+            active_cache.put(
+                file_bytes=data_bytes,
+                model_id=active_provider.model_id,
                 prompt_version=PROMPT_VERSION,
                 raw_extraction=raw_extraction,
                 session=session,
@@ -132,25 +129,25 @@ class ReceiptExtractor:
                 logger.warning("Replay mode: cannot retry live extraction for %s", rcpt_id)
             else:
                 try:
-                    retry_extraction = self.provider.extract_receipt(
-                        image_bytes=file_bytes,
+                    retry_extraction = active_provider.extract_receipt(
+                        image_bytes=data_bytes,
                         mime=mime,
                         hints=hints,
                         error_feedback=validation_error,
                     )
                     log_outbound_call(
                         file_hash=file_hash,
-                        payload_bytes=file_bytes,
-                        model_id=self.provider.model_id,
+                        payload_bytes=data_bytes,
+                        model_id=active_provider.model_id,
                         masked=False,
                         run_id=run_id,
                         session=session,
                     )
                     extracted, retry_error = parse_extracted_receipt(retry_extraction.raw_json)
                     if extracted is not None:
-                        self.cache.put(
-                            file_bytes=file_bytes,
-                            model_id=self.provider.model_id,
+                        active_cache.put(
+                            file_bytes=data_bytes,
+                            model_id=active_provider.model_id,
                             prompt_version=PROMPT_VERSION,
                             raw_extraction=retry_extraction,
                             session=session,
@@ -169,16 +166,17 @@ class ReceiptExtractor:
                 run_id=run_id,
                 source_file=source_file,
                 file_hash=file_hash,
-                vendor_key="unknown|",
+                vendor_key="unknown|nogstin",
                 doc_type="receipt",
                 extraction_status="FAILED",
                 check_messages=[f"Schema validation failed: {validation_error}"],
             )
 
-        # Normal success
+        # Normal success: compute normalised vendor_key and run arithmetic/confidence checks
         vendor_key = compute_vendor_key(extracted.vendor_name, extracted.vendor_gstin)
-        status = evaluate_confidence(extracted)
-        arithmetic_messages = check_receipt_arithmetic(extracted)
+        status, conf_warnings = evaluate_confidence_status(extracted)
+        arithmetic_messages = run_arithmetic_checks(extracted)
+        all_check_messages = arithmetic_messages + conf_warnings
 
         return Receipt(
             id=rcpt_id,
@@ -187,7 +185,7 @@ class ReceiptExtractor:
             file_hash=file_hash,
             vendor_key=vendor_key,
             extraction_status=status,
-            check_messages=arithmetic_messages,
+            check_messages=all_check_messages,
             doc_type=extracted.doc_type,
             vendor_name=extracted.vendor_name,
             vendor_gstin=extracted.vendor_gstin,
@@ -206,6 +204,8 @@ class ReceiptExtractor:
     def extract_text(
         self,
         raw_text: str,
+        provider: Provider | None = None,
+        cache: ExtractionCache | None = None,
         run_id: str = "run:default",
         receipt_id: str | None = None,
         source_file: str = "unknown",
@@ -213,17 +213,20 @@ class ReceiptExtractor:
         session: Session | None = None,
     ) -> Receipt:
         """Extract receipt from raw OCR text with PII masking, egress logging, and validation retry."""
+        active_provider = provider or self.provider
+        active_cache = cache or self.cache
+
         masked_text = mask_pii(raw_text)
-        text_bytes = masked_text.encode("utf-8")
+        text_bytes = masked_text.encode()
         file_hash = ExtractionCache.compute_hash(text_bytes)
         rcpt_id = receipt_id or f"rcpt:{file_hash[:8]}"
 
         raw_extraction: RawExtraction | None = None
 
         try:
-            raw_extraction = self.cache.get(
+            raw_extraction = active_cache.get(
                 file_bytes=text_bytes,
-                model_id=self.provider.model_id,
+                model_id=active_provider.model_id,
                 prompt_version=PROMPT_VERSION,
                 session=session,
             )
@@ -232,22 +235,22 @@ class ReceiptExtractor:
                 raise
 
         if raw_extraction is None:
-            raw_extraction = self.provider.structure_text(
+            raw_extraction = active_provider.structure_text(
                 masked_text=masked_text,
                 hints=hints,
             )
             log_outbound_call(
                 file_hash=file_hash,
                 payload_bytes=text_bytes,
-                model_id=self.provider.model_id,
+                model_id=active_provider.model_id,
                 masked=True,
                 run_id=run_id,
                 payload_raw=masked_text,
                 session=session,
             )
-            self.cache.put(
+            active_cache.put(
                 file_bytes=text_bytes,
-                model_id=self.provider.model_id,
+                model_id=active_provider.model_id,
                 prompt_version=PROMPT_VERSION,
                 raw_extraction=raw_extraction,
                 session=session,
@@ -262,7 +265,7 @@ class ReceiptExtractor:
                 logger.warning("Replay mode: cannot retry text extraction for %s", rcpt_id)
             else:
                 try:
-                    retry_extraction = self.provider.structure_text(
+                    retry_extraction = active_provider.structure_text(
                         masked_text=masked_text,
                         hints=hints,
                         error_feedback=validation_error,
@@ -270,7 +273,7 @@ class ReceiptExtractor:
                     log_outbound_call(
                         file_hash=file_hash,
                         payload_bytes=text_bytes,
-                        model_id=self.provider.model_id,
+                        model_id=active_provider.model_id,
                         masked=True,
                         run_id=run_id,
                         payload_raw=masked_text,
@@ -278,9 +281,9 @@ class ReceiptExtractor:
                     )
                     extracted, retry_error = parse_extracted_receipt(retry_extraction.raw_json)
                     if extracted is not None:
-                        self.cache.put(
+                        active_cache.put(
                             file_bytes=text_bytes,
-                            model_id=self.provider.model_id,
+                            model_id=active_provider.model_id,
                             prompt_version=PROMPT_VERSION,
                             raw_extraction=retry_extraction,
                             session=session,
@@ -296,15 +299,16 @@ class ReceiptExtractor:
                 run_id=run_id,
                 source_file=source_file,
                 file_hash=file_hash,
-                vendor_key="unknown|",
+                vendor_key="unknown|nogstin",
                 doc_type="receipt",
                 extraction_status="FAILED",
                 check_messages=[f"Schema validation failed: {validation_error}"],
             )
 
         vendor_key = compute_vendor_key(extracted.vendor_name, extracted.vendor_gstin)
-        status = evaluate_confidence(extracted)
-        arithmetic_messages = check_receipt_arithmetic(extracted)
+        status, conf_warnings = evaluate_confidence_status(extracted)
+        arithmetic_messages = run_arithmetic_checks(extracted)
+        all_check_messages = arithmetic_messages + conf_warnings
 
         return Receipt(
             id=rcpt_id,
@@ -313,7 +317,7 @@ class ReceiptExtractor:
             file_hash=file_hash,
             vendor_key=vendor_key,
             extraction_status=status,
-            check_messages=arithmetic_messages,
+            check_messages=all_check_messages,
             doc_type=extracted.doc_type,
             vendor_name=extracted.vendor_name,
             vendor_gstin=extracted.vendor_gstin,

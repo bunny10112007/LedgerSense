@@ -3,12 +3,16 @@ on: [push, pull_request]
 jobs:
   backend:
     runs-on: ubuntu-latest
+    env:
+      LLM_MODE: replay
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - run: cd backend && uv sync --frozen
       - run: cd backend && uv run ruff check .
-      - run: cd backend && uv run pytest -q # LLM_MODE=replay, no network
+      - run: cd backend && uv run pytest -q
+        env:
+          LLM_MODE: replay
   frontend:
     runs-on: ubuntu-latest
     steps:
