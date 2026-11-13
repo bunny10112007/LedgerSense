@@ -272,11 +272,13 @@ def test_extractor_second_failure_marks_failed_without_crashing(monkeypatch: pyt
 
 
 def test_vendor_key_deterministic_formatting() -> None:
-    """Test compute_vendor_key formats lowercase alphanumeric + dash and uppercase GSTIN."""
+    """Test compute_vendor_key formats lowercase alphanumeric + dash and uppercase GSTIN or nogstin."""
     assert compute_vendor_key("Aravali Stationers", "08AAAFA1234B1ZC") == "aravali-stationers|08AAAFA1234B1ZC"
     assert compute_vendor_key("Pink  City   Fuels", "08aaacp5678c1zd") == "pink-city-fuels|08AAACP5678C1ZD"
-    assert compute_vendor_key("Local Tea Stall", None) == "local-tea-stall|"
-    assert compute_vendor_key(None, None) == "unknown|"
+    assert compute_vendor_key("DeskCraft Furniture Pvt. Ltd.", "29AAACD9012L1ZI") == "deskcraft-furniture|29AAACD9012L1ZI"
+    assert compute_vendor_key("Shield Health Insurance Co. Ltd.", "27AAACS5678G1Z2") == "shield-health-insurance|27AAACS5678G1Z2"
+    assert compute_vendor_key("Local Tea Stall", None) == "local-tea-stall|nogstin"
+    assert compute_vendor_key(None, None) == "unknown|nogstin"
 
 
 def test_kimi_provider_backoff_retry_on_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
