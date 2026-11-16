@@ -1,4 +1,5 @@
 from ledgersense.tax.gstin import compute_gstin_check_char, validate_gstin
+from ledgersense.tax.itr_mapper import build_deductions, build_itr3_draft
 from ledgersense.tax.risk_detectors import (
     detect_all,
     detect_arithmetic_mismatches,
@@ -32,6 +33,8 @@ __all__ = [
     "GstBlockedItcRules",
     "IncomeTaxRules",
     "RuleSet",
+    "build_deductions",
+    "build_itr3_draft",
     "compute_gstin_check_char",
     "derive_regime",
     "detect_all",

@@ -1,0 +1,16 @@
+internal_field,account_code,itr3_schedule,itr3_field_name,json_path,notes
+total_income,4000-Client Revenue,Schedule PL,Gross Receipts from Profession/Business,ITR.ITR3.PartA_PL.GrossReceipts,Verified
+expenses.office_stationery,5000-Office & Stationery Expense,Schedule PL,Printing and Stationery,ITR.ITR3.PartA_PL.PrintingStationery,Verified
+expenses.fuel,5010-Fuel Expense,Schedule PL,Travelling Expenses,ITR.ITR3.PartA_PL.TravellingExpenses,Verified
+expenses.software_it,5020-Software & IT Expense,Schedule PL,Other Expenses (IT/Software),TBD (Draft Schema),Unverified utility JSON path
+expenses.dining,5030-Food & Beverage Expense,Schedule PL,Entertainment / Food & Beverage,TBD (Draft Schema),Unverified utility JSON path
+expenses.travel,5040-Travel & Cab Expense,Schedule PL,Travelling and Conveyance,ITR.ITR3.PartA_PL.TravellingConveyance,Verified
+expenses.hardware_repairs,5050-Hardware & Repairs Expense,Schedule PL,Repairs and Maintenance (Machinery/Others),ITR.ITR3.PartA_PL.RepairsOthers,Verified
+expenses.printing,5060-Printing Expense,Schedule PL,Printing and Stationery,ITR.ITR3.PartA_PL.PrintingStationery,Verified
+expenses.motor_vehicle,5070-Motor Vehicle Expense,Schedule PL,Vehicle Running and Maintenance,ITR.ITR3.PartA_PL.VehicleRunningExpenses,Verified
+expenses.insurance,5080-Insurance Expense,Schedule PL,Insurance,ITR.ITR3.PartA_PL.Insurance,Verified
+expenses.general_petty,5090-General / Petty Expense,Schedule PL,Miscellaneous Expenses,TBD (Draft Schema),Unverified utility JSON path
+net_profit,N/A,Schedule BP,Net Profit as per Profit and Loss Account,ITR.ITR3.ScheduleBP.NetProfit,Verified
+disallowance.cash_limit,N/A,Schedule BP,Disallowance u/s 40A(3) for Cash Payments Exceeding Limit,ITR.ITR3.ScheduleBP.Disallowances.Sec40A3,TBD (Draft Schema)
+deductions.80C,N/A,Schedule VI-A,Section 80C (Life Insurance, PPF, etc.),ITR.ITR3.ScheduleVIA.Us80C,Verified
+deductions.80D,N/A,Schedule VI-A,Section 80D (Health Insurance Premium),ITR.ITR3.ScheduleVIA.Us80D,Verified
