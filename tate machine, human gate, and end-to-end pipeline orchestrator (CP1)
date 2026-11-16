@@ -1,0 +1,25 @@
+* [33m237b682[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/i-1/pipeline-integration[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feat/b/journal-statements[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeat/b/journal-statements[m[33m)[m feat(b-3): implement double-entry journal engine, financial statements, and immutable audit log
+* [33m9e4b2f4[m[33m ([m[1;31morigin/feat/b/risk-detectors[m[33m, [m[1;32mfeat/b/risk-detectors[m[33m)[m feat(b-2): implement all 9 pure statutory and audit risk detectors with golden test suite
+* [33md927aaf[m[33m ([m[1;31morigin/feat/b/gstin-rules[m[33m, [m[1;32mfeat/b/gstin-rules[m[33m)[m feat(b-1): implement mod-36 GSTIN validator and regime-aware YAML rules engine
+*   [33ma7ac864[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31mupstream/HEAD[m[33m)[m Merge pull request #6 from bunny10112007/feat/a/extractor-matcher
+[32m|[m[33m\[m  
+[32m|[m * [33mc9a1f56[m fix(ci): handle empty API key in replay mode and set LLM_MODE=replay in ci.yml
+[32m|[m * [33md2c6680[m feat(a-3): implement receipt normalisation, arithmetic checks, bank CSV parser, and golden matcher
+* [33m|[m [33m16c5d0b[m Merge pull request #5 from bunny10112007/feat/a/llm-cache-masker-1
+[34m|[m[33m\[m[33m|[m 
+[34m|[m * [33mb374fa1[m feat(a-2): add extraction cache, retry loop, egress log, and GSTIN-safe PII masker
+* [35m|[m [33m8144ff3[m Merge pull request #4 from bunny10112007/feat/a/llm-cache-masker
+[36m|[m[35m\[m[35m|[m 
+[36m|[m * [33m94898b7[m feat(a-1): add core config, SQLModel DB tables, Kimi provider, and golden data generator
+* [1;31m|[m [33m4f97f4a[m Merge pull request #3 from bunny10112007/feat/a/scaffold-kimi-smoke
+[1;32m|[m[1;31m\[m[1;31m|[m 
+[1;32m|[m * [33m4ea9116[m feat(a-1): add core config, SQLModel DB tables, Kimi provider, and golden data generator
+[1;32m|[m[1;32m/[m  
+*   [33mce77fbc[m Merge pull request #2 from bunny10112007/chore/cp0-contract-freeze
+[1;34m|[m[1;35m\[m  
+[1;34m|[m * [33ma7d2ab5[m chore(cp0): finalize models.py contracts and scaffold Vite frontend shell for CI
+[1;34m|[m * [33m5b6707a[m chore(cp0): freeze domain models, YAML rules, API contracts, and golden answer key
+[1;34m|[m * [33mdd50c8a[m chore(cp0): freeze domain models, YAML rules, API contracts, and golden answer key
+[1;34m|[m * [33m99c4c7e[m chore(cp0): bootstrap monorepo, freeze domain models, YAML rules, and golden answer key
+[1;34m|[m[1;34m/[m  
+* [33ma75aff5[m Initial commit
