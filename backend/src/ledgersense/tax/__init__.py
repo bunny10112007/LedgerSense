@@ -1,4 +1,16 @@
 from ledgersense.tax.gstin import compute_gstin_check_char, validate_gstin
+from ledgersense.tax.risk_detectors import (
+    detect_all,
+    detect_arithmetic_mismatches,
+    detect_blocked_itc,
+    detect_cash_limit,
+    detect_duplicates,
+    detect_invalid_gstin,
+    detect_low_confidence,
+    detect_out_of_period,
+    detect_unmatched_bank,
+    detect_unmatched_receipts,
+)
 from ledgersense.tax.rules_engine import (
     BlockedItcCategoryRule,
     CashExpenseLimitRule,
@@ -22,6 +34,16 @@ __all__ = [
     "RuleSet",
     "compute_gstin_check_char",
     "derive_regime",
+    "detect_all",
+    "detect_arithmetic_mismatches",
+    "detect_blocked_itc",
+    "detect_cash_limit",
+    "detect_duplicates",
+    "detect_invalid_gstin",
+    "detect_low_confidence",
+    "detect_out_of_period",
+    "detect_unmatched_bank",
+    "detect_unmatched_receipts",
     "load_gst_rules",
     "load_it_rules",
     "load_rules",
