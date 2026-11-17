@@ -1,5 +1,6 @@
 import json
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from sqlmodel import Session, select
 
@@ -29,10 +30,12 @@ from ledgersense.domain.models import (
     AuditEvent,
     BankLine,
     JournalEntry,
+    JournalLine,
     Match,
     Receipt,
     RiskFlag,
     Run,
+    RunConfig,
 )
 
 
@@ -60,6 +63,20 @@ class Repository:
 
     def get_run(self, run_id: str) -> RunRecord | None:
         return self.session.get(RunRecord, run_id)
+
+    def get_domain_run(self, run_id: str) -> Run | None:
+        record = self.get_run(run_id)
+        if not record:
+            return None
+        return Run(
+            id=record.id,
+            period_start=record.period_start,
+            period_end=record.period_end,
+            regime=record.regime,
+            status=record.status,
+            config=RunConfig.model_validate_json(record.config_json),
+            created_at=record.created_at,
+        )
 
     def update_run_status(self, run_id: str, status: str) -> RunRecord | None:
         run = self.get_run(run_id)
@@ -97,6 +114,10 @@ class Repository:
         statement = select(ReceiptRecord).where(ReceiptRecord.run_id == run_id)
         return list(self.session.exec(statement).all())
 
+    def get_domain_receipts(self, run_id: str) -> list[Receipt]:
+        records = self.get_receipts(run_id)
+        return [Receipt.model_validate_json(r.payload_json) for r in records]
+
     # --- Bank Lines ---
     def save_bank_lines(self, lines: list[BankLine]) -> None:
         for b in lines:
@@ -116,6 +137,22 @@ class Repository:
     def get_bank_lines(self, run_id: str) -> list[BankLineRecord]:
         statement = select(BankLineRecord).where(BankLineRecord.run_id == run_id)
         return list(self.session.exec(statement).all())
+
+    def get_domain_bank_lines(self, run_id: str) -> list[BankLine]:
+        records = self.get_bank_lines(run_id)
+        return [
+            BankLine(
+                id=b.id,
+                run_id=b.run_id,
+                txn_date=b.txn_date,
+                narration=b.narration,
+                debit=Decimal(b.debit),
+                credit=Decimal(b.credit),
+                balance=Decimal(b.balance) if b.balance is not None else None,
+                ref_no=b.ref_no,
+            )
+            for b in records
+        ]
 
     # --- Matches ---
     def save_matches(self, matches: list[Match]) -> None:
@@ -138,6 +175,22 @@ class Repository:
     def get_matches(self, run_id: str) -> list[MatchRecord]:
         statement = select(MatchRecord).where(MatchRecord.run_id == run_id)
         return list(self.session.exec(statement).all())
+
+    def get_domain_matches(self, run_id: str) -> list[Match]:
+        records = self.get_matches(run_id)
+        return [
+            Match(
+                id=m.id,
+                run_id=m.run_id,
+                receipt_id=m.receipt_id,
+                bank_line_id=m.bank_line_id,
+                score=m.score,
+                kind=m.kind,
+                date_delta_days=m.date_delta_days,
+                amount_delta=Decimal(m.amount_delta) if m.amount_delta is not None else None,
+            )
+            for m in records
+        ]
 
     # --- Risk Flags ---
     def save_risk_flags(self, flags: list[RiskFlag]) -> None:
@@ -166,6 +219,26 @@ class Repository:
         if status:
             statement = statement.where(RiskFlagRecord.status == status)
         return list(self.session.exec(statement).all())
+
+    def get_domain_risk_flags(self, run_id: str, status: str | None = None) -> list[RiskFlag]:
+        records = self.get_risk_flags(run_id, status=status)
+        return [
+            RiskFlag(
+                id=f.id,
+                run_id=f.run_id,
+                rule_id=f.rule_id,
+                severity=f.severity,
+                status=f.status,
+                entity_ids=json.loads(f.entity_ids_json) if f.entity_ids_json else [],
+                legal_ref=f.legal_ref,
+                evidence=json.loads(f.evidence_json) if f.evidence_json else {},
+                suggested_action=f.suggested_action,
+                decided_by=f.decided_by,
+                decision_reason=f.decision_reason,
+                decided_at=f.decided_at,
+            )
+            for f in records
+        ]
 
     def update_risk_flag_decision(
         self, flag_id: str, decided_by: str, decision: str, reason: str
@@ -215,6 +288,51 @@ class Repository:
             statement = statement.where(JournalEntryRecord.status == status)
         return list(self.session.exec(statement).all())
 
+    def clear_journal_entries(self, run_id: str) -> None:
+        entries = list(self.session.exec(
+            select(JournalEntryRecord).where(JournalEntryRecord.run_id == run_id)
+        ).all())
+        for e in entries:
+            lines = list(self.session.exec(
+                select(JournalLineRecord).where(JournalLineRecord.entry_id == e.id)
+            ).all())
+            for line in lines:
+                self.session.delete(line)
+            self.session.delete(e)
+        self.session.commit()
+
+    def get_domain_journal_entries(
+        self, run_id: str, status: str | None = None
+    ) -> list[JournalEntry]:
+        records = self.get_journal_entries(run_id, status=status)
+        entries: list[JournalEntry] = []
+        for rec in records:
+            lines_records = list(self.session.exec(
+                select(JournalLineRecord).where(JournalLineRecord.entry_id == rec.id)
+            ).all())
+            lines = [
+                JournalLine(
+                    account_code=l.account_code,
+                    debit=Decimal(l.debit),
+                    credit=Decimal(l.credit),
+                )
+                for l in lines_records
+            ]
+            entries.append(
+                JournalEntry(
+                    id=rec.id,
+                    run_id=rec.run_id,
+                    entry_date=rec.entry_date,
+                    status=rec.status,
+                    narration=rec.narration,
+                    lines=lines,
+                    source_receipt_id=rec.source_receipt_id,
+                    flag_ids=json.loads(rec.flag_ids_json) if rec.flag_ids_json else [],
+                    deduction_tag=rec.deduction_tag,
+                )
+            )
+        return entries
+
     # --- Audit Events (Append-only) ---
     def append_audit_event(self, event: AuditEvent) -> AuditEventRecord:
         record = AuditEventRecord(
@@ -239,6 +357,22 @@ class Repository:
             .order_by(AuditEventRecord.ts)
         )
         return list(self.session.exec(statement).all())
+
+    def get_domain_audit_events(self, run_id: str) -> list[AuditEvent]:
+        records = self.get_audit_events(run_id)
+        return [
+            AuditEvent(
+                id=r.id,
+                ts=r.ts,
+                run_id=r.run_id,
+                actor=r.actor,
+                action=r.action,
+                entity_id=r.entity_id,
+                reason=r.reason,
+                payload_hash=r.payload_hash,
+            )
+            for r in records
+        ]
 
     # --- Extraction Cache ---
     def get_extraction_cache(
