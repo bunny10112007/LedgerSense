@@ -85,21 +85,54 @@ def map_expense_account(receipt: Receipt) -> str:
         + " ".join(item.description for item in receipt.line_items if item.description)
     ).lower()
 
-    if any(k in text_corpus for k in ("stationer", "stationery", "paper", "pen", "notebook")):
+    if any(
+        k in text_corpus
+        for k in ("stationer", "stationery", "paper", "pen", "notebook")
+    ):
         return EXP_OFFICE
     if any(k in text_corpus for k in ("fuel", "petrol", "diesel")):
         return EXP_FUEL
-    if any(k in text_corpus for k in ("software", "cloud", "aws", "github", "hosting", "saas", "subscription")):
+    if any(
+        k in text_corpus
+        for k in (
+            "software",
+            "cloud",
+            "aws",
+            "github",
+            "hosting",
+            "saas",
+            "subscription",
+        )
+    ):
         return EXP_SOFTWARE
-    if any(k in text_corpus for k in ("restaurant", "dining", "cater", "canteen", "cafe", "food", "beverage")):
+    if any(
+        k in text_corpus
+        for k in (
+            "restaurant",
+            "dining",
+            "cater",
+            "canteen",
+            "cafe",
+            "food",
+            "beverage",
+        )
+    ):
         return EXP_DINING
-    if any(k in text_corpus for k in ("cab", "taxi", "fare", "travel", "uber", "ola", "mobility")):
+    if any(
+        k in text_corpus
+        for k in ("cab", "taxi", "fare", "travel", "uber", "ola", "mobility")
+    ):
         return EXP_TRAVEL
-    if any(k in text_corpus for k in ("furniture", "hardware", "desk", "chair", "repair")):
+    if any(
+        k in text_corpus for k in ("furniture", "hardware", "desk", "chair", "repair")
+    ):
         return EXP_HARDWARE
     if any(k in text_corpus for k in ("print", "printing", "press")):
         return EXP_PRINTING
-    if any(k in text_corpus for k in ("motor", "vehicle", "car service", "car repair", "spare parts")):
+    if any(
+        k in text_corpus
+        for k in ("motor", "vehicle", "car service", "car repair", "spare parts")
+    ):
         return EXP_MOTOR
     if any(k in text_corpus for k in ("insurance", "premium", "policy")):
         return EXP_INSURANCE

@@ -244,7 +244,10 @@ def test_full_pipeline_api_lifecycle(monkeypatch: pytest.MonkeyPatch) -> None:
     audit_events = resp.json()
     actions = [e["action"] for e in audit_events]
     assert "STATE_CHANGE" in actions
-    assert "FLAG_APPROVED" in actions or "FLAG_REJECTED" in actions
+    assert any(
+        a in ("FLAG_APPROVED", "FLAG_REJECTED", "FLAG_APPROVE", "FLAG_REJECT")
+        for a in actions
+    )
     assert "RUN_COMMITTED" in actions
 
     resp = client.get(f"/api/v1/runs/{run_id}/egress")

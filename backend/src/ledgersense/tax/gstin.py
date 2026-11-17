@@ -38,26 +38,38 @@ def validate_gstin(value: str) -> GstinResult:
         return GstinResult(ok=False, reason="invalid_length", expected_check_char=None)
 
     if any(c.islower() for c in value):
-        return GstinResult(ok=False, reason="lowercase_not_allowed", expected_check_char=None)
+        return GstinResult(
+            ok=False, reason="lowercase_not_allowed", expected_check_char=None
+        )
 
     state_code = value[0:2]
     if state_code not in VALID_STATE_CODES:
-        return GstinResult(ok=False, reason="invalid_state_code", expected_check_char=None)
+        return GstinResult(
+            ok=False, reason="invalid_state_code", expected_check_char=None
+        )
 
     pan_part = value[2:12]
     if not PAN_PATTERN.match(pan_part):
-        return GstinResult(ok=False, reason="invalid_pan_format", expected_check_char=None)
+        return GstinResult(
+            ok=False, reason="invalid_pan_format", expected_check_char=None
+        )
 
     entity_code = value[12]
     if not ENTITY_CODE_PATTERN.match(entity_code):
-        return GstinResult(ok=False, reason="invalid_entity_code", expected_check_char=None)
+        return GstinResult(
+            ok=False, reason="invalid_entity_code", expected_check_char=None
+        )
 
     default_char = value[13]
     if default_char != "Z":
-        return GstinResult(ok=False, reason="invalid_default_char", expected_check_char=None)
+        return GstinResult(
+            ok=False, reason="invalid_default_char", expected_check_char=None
+        )
 
     expected = compute_gstin_check_char(value[:14])
     if value[14] != expected:
-        return GstinResult(ok=False, reason="checksum_mismatch", expected_check_char=expected)
+        return GstinResult(
+            ok=False, reason="checksum_mismatch", expected_check_char=expected
+        )
 
     return GstinResult(ok=True, reason=None, expected_check_char=expected)

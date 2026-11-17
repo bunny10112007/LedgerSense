@@ -74,8 +74,7 @@ def build_entries(
             for f in rcpt_flags
         )
         is_rejected_out_of_period = any(
-            f.rule_id == "OUT_OF_PERIOD" and f.status == "REJECTED"
-            for f in rcpt_flags
+            f.rule_id == "OUT_OF_PERIOD" and f.status == "REJECTED" for f in rcpt_flags
         )
         if is_rejected_duplicate or is_rejected_out_of_period:
             continue
@@ -86,7 +85,8 @@ def build_entries(
         # Determine ITC eligibility:
         # Blocked under s.17(5) or invalid GSTIN under s.16(2)(aa)
         itc_blocked = any(
-            f.rule_id in ("ITC_BLOCKED", "GSTIN_INVALID") and f.status != "AUTO_RESOLVED"
+            f.rule_id in ("ITC_BLOCKED", "GSTIN_INVALID")
+            and f.status != "AUTO_RESOLVED"
             for f in rcpt_flags
         )
 
@@ -109,7 +109,9 @@ def build_entries(
             )
         else:
             # ITC is eligible: debit net subtotal to expense, debit input GST accounts
-            subtotal = rcpt.subtotal if rcpt.subtotal is not None else (rcpt.total - tax_total)
+            subtotal = (
+                rcpt.subtotal if rcpt.subtotal is not None else (rcpt.total - tax_total)
+            )
             lines.append(
                 JournalLine(
                     account_code=expense_account,
@@ -118,11 +120,23 @@ def build_entries(
                 )
             )
             if cgst > Decimal("0.00"):
-                lines.append(JournalLine(account_code=INPUT_CGST, debit=cgst, credit=Decimal("0.00")))
+                lines.append(
+                    JournalLine(
+                        account_code=INPUT_CGST, debit=cgst, credit=Decimal("0.00")
+                    )
+                )
             if sgst > Decimal("0.00"):
-                lines.append(JournalLine(account_code=INPUT_SGST, debit=sgst, credit=Decimal("0.00")))
+                lines.append(
+                    JournalLine(
+                        account_code=INPUT_SGST, debit=sgst, credit=Decimal("0.00")
+                    )
+                )
             if igst > Decimal("0.00"):
-                lines.append(JournalLine(account_code=INPUT_IGST, debit=igst, credit=Decimal("0.00")))
+                lines.append(
+                    JournalLine(
+                        account_code=INPUT_IGST, debit=igst, credit=Decimal("0.00")
+                    )
+                )
 
         # Credit account resolution
         match = matches_by_receipt.get(rcpt.id)
@@ -190,8 +204,6 @@ def commit_entries(
         if entry.source_receipt_id and entry.source_receipt_id in rejected_entity_ids:
             continue  # Exclude rejected items
 
-        committed.append(
-            entry.model_copy(update={"status": "COMMITTED"})
-        )
+        committed.append(entry.model_copy(update={"status": "COMMITTED"}))
 
     return committed

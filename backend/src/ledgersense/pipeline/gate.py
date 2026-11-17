@@ -1,54 +1,5 @@
 from __future__ import annotations
 
-<<<<<<< HEAD
-import json
-
-from sqlmodel import Session, select
-
-from ledgersense.db.models import RiskFlagRecord
-from ledgersense.domain.models import RiskFlag
-
-
-def can_commit(run_id: str, session: Session) -> tuple[bool, list[RiskFlag]]:
-    """Check if a run is cleared for commit.
-
-    Returns (False, open_high_flags) if any HIGH severity risk flag remains OPEN.
-    Otherwise returns (True, []).
-    """
-    statement = (
-        select(RiskFlagRecord)
-        .where(RiskFlagRecord.run_id == run_id)
-        .where(RiskFlagRecord.severity == "HIGH")
-        .where(RiskFlagRecord.status == "OPEN")
-    )
-    records = list(session.exec(statement).all())
-
-    if not records:
-        return True, []
-
-    open_high_flags: list[RiskFlag] = []
-    for r in records:
-        entity_ids = json.loads(r.entity_ids_json) if r.entity_ids_json else []
-        evidence = json.loads(r.evidence_json) if r.evidence_json else {}
-        open_high_flags.append(
-            RiskFlag(
-                id=r.id,
-                run_id=r.run_id,
-                rule_id=r.rule_id,
-                severity=r.severity,  # type: ignore[arg-type]
-                entity_ids=entity_ids,
-                legal_ref=r.legal_ref,
-                evidence=evidence,
-                suggested_action=r.suggested_action,
-                status=r.status,  # type: ignore[arg-type]
-                decided_by=r.decided_by,
-                decision_reason=r.decision_reason,
-                decided_at=r.decided_at,
-            )
-        )
-
-    return False, open_high_flags
-=======
 from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
@@ -63,22 +14,42 @@ from ledgersense.pipeline.state_machine import transition_run
 ALLOWED_AUDITORS: frozenset[str] = frozenset({"auditor-a", "auditor-b"})
 
 
-def can_commit(flags: list[RiskFlag]) -> tuple[bool, list[RiskFlag]]:
+def can_commit(
+    target: str | list[RiskFlag] | Session,
+    session: Session | str | None = None,
+) -> tuple[bool, list[RiskFlag]]:
     """Determine whether a run can commit based on HIGH severity OPEN flags.
+
+    Can be called with:
+    - can_commit(flags: list[RiskFlag])
+    - can_commit(run_id: str, session: Session)
+    - can_commit(session: Session, run_id: str)
 
     Returns:
     - (False, open_high_flags) if any HIGH severity risk flag remains OPEN.
     - (True, []) when zero HIGH severity risk flags are OPEN.
     """
+    if isinstance(target, list):
+        open_high = [f for f in target if f.severity == "HIGH" and f.status == "OPEN"]
+        return len(open_high) == 0, open_high
+
+    if isinstance(target, Session):
+        s: Session = target
+        rid: str = str(session)
+    else:
+        rid = str(target)
+        assert isinstance(session, Session)
+        s = session
+
+    repo = Repository(s)
+    flags = repo.get_domain_risk_flags(rid)
     open_high = [f for f in flags if f.severity == "HIGH" and f.status == "OPEN"]
-    return (len(open_high) == 0, open_high)
+    return len(open_high) == 0, open_high
 
 
 def check_run_gate(session: Session, run_id: str) -> tuple[bool, list[RiskFlag]]:
     """Check the commit gate for a run in the database."""
-    repo = Repository(session)
-    flags = repo.get_domain_risk_flags(run_id)
-    return can_commit(flags)
+    return can_commit(run_id, session)
 
 
 def record_flag_decision(
@@ -100,7 +71,9 @@ def record_flag_decision(
     automatically transitions the run status to APPROVED.
     """
     if auditor_id not in ALLOWED_AUDITORS:
-        raise ValueError(f"Invalid auditor ID '{auditor_id}'. Allowed: {sorted(ALLOWED_AUDITORS)}")
+        raise ValueError(
+            f"Invalid auditor ID '{auditor_id}'. Allowed: {sorted(ALLOWED_AUDITORS)}"
+        )
 
     clean_reason = reason.strip()
     if len(clean_reason) < 10:
@@ -110,7 +83,9 @@ def record_flag_decision(
 
     clean_decision = decision.strip().lower()
     if clean_decision not in ("approve", "reject"):
-        raise ValueError(f"Invalid decision '{decision}'. Must be 'approve' or 'reject'.")
+        raise ValueError(
+            f"Invalid decision '{decision}'. Must be 'approve' or 'reject'."
+        )
 
     repo = Repository(session)
     flag_record = repo.update_risk_flag_decision(
@@ -157,9 +132,7 @@ def record_flag_decision(
                 reason="All HIGH risk flags resolved by auditor decision",
             )
 
-    # Retrieve and return updated RiskFlag domain object
     matching_flags = [f for f in all_flags if f.id == flag_id]
     if not matching_flags:
         raise ValueError(f"Failed to load updated RiskFlag '{flag_id}'")
     return matching_flags[0]
->>>>>>> 002af4b0f998fc47ba702aa7c12154a99ecd8744
