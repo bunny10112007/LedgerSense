@@ -1,6 +1,6 @@
 # LedgerSense — Autonomous Audit & Indian Tax-Compliance Copilot
 
-LedgerSense is an autonomous audit and Indian tax-compliance copilot designed for Indian businesses, chartered accountants, and tax professionals. It pairs multimodal perception models (such as Moonshot Kimi) with rigorous, deterministic Python accounting and statutory rules engines to ingest invoices and receipts, reconcile them against bank statement CSVs, detect compliance and audit anomalies, enforce a mandatory human auditor sign-off gate, and commit double-entry books into balanced financial statements and draft ITR-3 tax schedules.
+LedgerSense is an autonomous audit and Indian tax-compliance copilot designed for Indian businesses, chartered accountants, and tax professionals. It pairs multimodal perception models (such as Argon Vision) with rigorous, deterministic Python accounting and statutory rules engines to ingest invoices and receipts, reconcile them against bank statement CSVs, detect compliance and audit anomalies, enforce a mandatory human auditor sign-off gate, and commit double-entry books into balanced financial statements and draft ITR-3 tax schedules.
 
 ---
 
@@ -77,7 +77,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to interact 
                         │      Perception Layer (llm/, extraction/)     │
                         │  - PII Masking (PAN, Aadhaar, Phone scrub)   │
                         │  - SHA-256 Cache Lookup (Replay Mode)        │
-                        │  - Moonshot Kimi Vision with Auto-Retry      │
+                        │  - Argon Vision with Auto-Retry              │
                         │  - Structured ExtractedReceipt Parsing       │
                         │  - Arithmetic & GSTIN Mod-36 Cross-Checks    │
                         └──────────────────────┬───────────────────────┘
@@ -159,7 +159,7 @@ LedgerSense/
 │   │   ├── db/                  # SQLModel tables, session factory, repository
 │   │   ├── domain/              # Frozen Pydantic domain models (models.py)
 │   │   ├── extraction/          # Document perception normalizer, GSTIN checks
-│   │   ├── llm/                 # Provider protocol, Kimi provider, PII scrubber, cache
+│   │   ├── llm/                 # Provider protocol, Argon provider, PII scrubber, cache
 │   │   ├── matching/            # Bank CSV parser and deterministic reconciliation matcher
 │   │   ├── pipeline/            # State machine orchestrator and human auditor gate
 │   │   └── tax/                 # Statutory risk detectors, ITR mapper, YAML rules

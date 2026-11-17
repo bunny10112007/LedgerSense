@@ -111,7 +111,7 @@ export const api = {
       return await request<{ status: string; llm_mode: string; model_id: string }>('/health');
     } catch (err: unknown) {
       if (err instanceof Error && 'status' in (err as object)) throw err;
-      return { status: 'ok', llm_mode: 'replay', model_id: 'moonshot-v1-8k-vision-preview' };
+      return { status: 'ok', llm_mode: 'replay', model_id: 'argon-vision-v1' };
     }
   },
 

@@ -17,7 +17,7 @@ Every HTTP error response adheres to the standard JSON structure with a stable m
 ```
 
 ### Notable Error Codes
-- `LLM_UNAVAILABLE` (HTTP 502): External Moonshot/Kimi provider unreachable or failed. Suggests switching to replay mode (`LLM_MODE=replay`).
+- `LLM_UNAVAILABLE` (HTTP 502): External Argon provider unreachable or failed. Suggests switching to replay mode (`LLM_MODE=replay`).
 - `GATE_BLOCKED_HIGH_RISK` (HTTP 409): Run commit rejected because one or more `HIGH` severity risk flags remain `OPEN`.
 - `INVALID_AUDITOR_DECISION` (HTTP 422): Auditor decision missing required ID or reason is less than 10 characters.
 - `VALIDATION_FAILED` (HTTP 422): Schema or arithmetic validation failure on incoming request data.
@@ -38,7 +38,7 @@ CORS middleware reads `ALLOWED_ORIGINS` from environment/config (default: `http:
      {
        "status": "ok",
        "llm_mode": "replay",
-       "model_id": "moonshot-v1-8k-vision-preview"
+       "model_id": "argon-vision-v1"
      }
      ```
    - **Notes**: Reports service status and whether LLM is running in `live` or `replay` mode.
@@ -201,4 +201,4 @@ CORS middleware reads `ALLOWED_ORIGINS` from environment/config (default: `http:
         "entries": []
       }
       ```
-    - **Notes**: Transparent log of all outbound calls to Kimi API. Confirms bank data was never transmitted.
+    - **Notes**: Transparent log of all outbound calls to Argon API. Confirms bank data was never transmitted.

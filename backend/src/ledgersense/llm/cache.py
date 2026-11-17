@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from ledgersense.core.config import settings
 from ledgersense.db.models import ExtractionCacheRecord
@@ -118,17 +118,24 @@ class ExtractionCache:
         prompt_version: str,
         session: Session | None = None,
     ) -> str | None:
-        if session:
-            record = session.get(
-                ExtractionCacheRecord, (file_hash, model_id, prompt_version)
+        def _find(s: Session) -> str | None:
+            # 1. Exact match on composite PK
+            rec = s.get(ExtractionCacheRecord, (file_hash, model_id, prompt_version))
+            if rec:
+                return rec.response_json
+            # 2. Fallback to any cached record for this file_hash and prompt_version
+            stmt = select(ExtractionCacheRecord).where(
+                ExtractionCacheRecord.file_hash == file_hash,
+                ExtractionCacheRecord.prompt_version == prompt_version,
             )
-            return record.response_json if record else None
+            rec = s.exec(stmt).first()
+            return rec.response_json if rec else None
+
+        if session:
+            return _find(session)
         try:
             with Session(engine) as s:
-                record = s.get(
-                    ExtractionCacheRecord, (file_hash, model_id, prompt_version)
-                )
-                return record.response_json if record else None
+                return _find(s)
         except (SQLAlchemyError, OSError) as exc:
             logger.debug("Database cache lookup error: %s", exc)
             return None
@@ -155,7 +162,12 @@ class ExtractionCache:
                 with open(cache_index, encoding="utf-8") as f:
                     index_data = json.load(f)
                 key = f"{file_hash}:{model_id}:{prompt_version}"
-                return index_data.get(key)
+                if key in index_data:
+                    return index_data[key]
+                prefix = f"{file_hash}:"
+                for k, v in index_data.items():
+                    if k.startswith(prefix):
+                        return v
             except (json.JSONDecodeError, OSError) as exc:
                 logger.debug("Disk cache index lookup error: %s", exc)
 

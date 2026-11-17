@@ -50,7 +50,7 @@ export const EgressDrawer: React.FC<EgressDrawerProps> = ({ isOpen, onClose, egr
               <span>Zero Bank Data Egress Policy</span>
             </div>
             <p className="text-xs text-emerald-800 leading-relaxed">
-              Bank statements are parsed strictly locally by deterministic Python parsers. No bank transaction narration, balance, account number, or financial figure is ever transmitted to Moonshot Kimi or any external AI model.
+              Bank statements are parsed strictly locally by deterministic Python parsers. No bank transaction narration, balance, account number, or financial figure is ever transmitted to Argon or any external AI model.
             </p>
             <div className="pt-2 border-t border-emerald-200/60 flex items-center space-x-2 text-xs font-semibold text-emerald-950">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />

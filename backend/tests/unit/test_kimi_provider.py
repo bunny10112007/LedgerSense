@@ -4,7 +4,9 @@ from decimal import Decimal
 import httpx
 from openai import OpenAI
 
+from ledgersense.core.config import settings
 from ledgersense.domain.models import ExtractedReceipt
+from ledgersense.llm.argon_provider import ArgonProvider
 from ledgersense.llm.kimi_provider import KimiProvider
 from ledgersense.llm.provider import Provider, RawExtraction
 
@@ -21,7 +23,7 @@ def create_mock_client(payload_dict: dict) -> OpenAI:
             "id": "chatcmpl-mock-123",
             "object": "chat.completion",
             "created": 1700000000,
-            "model": req_body.get("model", "moonshot-v1-8k-vision-preview"),
+            "model": req_body.get("model", settings.ARGON_MODEL),
             "choices": [
                 {
                     "index": 0,
@@ -44,19 +46,23 @@ def create_mock_client(payload_dict: dict) -> OpenAI:
     http_client = httpx.Client(transport=transport)
     return OpenAI(
         api_key="mock-api-key-never-sent",
-        base_url="https://mock.moonshot.cn/v1",
+        base_url="https://mock.argon.ai/v1",
         http_client=http_client,
     )
 
 
-def test_kimi_provider_satisfies_protocol():
+def test_argon_and_kimi_provider_satisfies_protocol():
     mock_client = create_mock_client({"doc_type": "receipt"})
-    provider = KimiProvider(client=mock_client)
-    assert isinstance(provider, Provider)
-    assert provider.model_id == "moonshot-v1-8k-vision-preview"
+    argon_provider = ArgonProvider(client=mock_client)
+    assert isinstance(argon_provider, Provider)
+    assert argon_provider.model_id == "argon-vision-v1"
+
+    kimi_provider = KimiProvider(client=mock_client)
+    assert isinstance(kimi_provider, Provider)
+    assert kimi_provider.model_id == "argon-vision-v1"
 
 
-def test_kimi_provider_extract_receipt_mock_transport():
+def test_argon_provider_extract_receipt_mock_transport():
     sample_json = {
         "doc_type": "gst_invoice",
         "vendor_name": "Aravali Stationers",
@@ -87,13 +93,13 @@ def test_kimi_provider_extract_receipt_mock_transport():
     }
 
     mock_client = create_mock_client(sample_json)
-    provider = KimiProvider(client=mock_client)
+    provider = ArgonProvider(client=mock_client)
 
     dummy_image_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDRdummyimagebytes"
     extraction = provider.extract_receipt(dummy_image_bytes, mime="image/png")
 
     assert isinstance(extraction, RawExtraction)
-    assert extraction.model_id == "moonshot-v1-8k-vision-preview"
+    assert extraction.model_id == "argon-vision-v1"
     assert extraction.prompt_version == "v1"
     assert extraction.prompt_tokens == 128
     assert extraction.completion_tokens == 64
@@ -107,7 +113,7 @@ def test_kimi_provider_extract_receipt_mock_transport():
     assert parsed.payment_mode == "upi"
 
 
-def test_kimi_provider_structure_text_mock_transport():
+def test_argon_provider_structure_text_mock_transport():
     sample_json = {
         "doc_type": "fare",
         "vendor_name": "QuickCab Mobility",
@@ -119,7 +125,7 @@ def test_kimi_provider_structure_text_mock_transport():
     }
 
     mock_client = create_mock_client(sample_json)
-    provider = KimiProvider(client=mock_client)
+    provider = ArgonProvider(client=mock_client)
 
     extraction = provider.structure_text("Cab trip receipt RCP-5529 INR 640.00")
     assert isinstance(extraction, RawExtraction)

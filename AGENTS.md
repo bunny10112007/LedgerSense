@@ -1,7 +1,7 @@
 # LedgerSense — Engineering Rules
 
 ## Product
-Autonomous audit and Indian tax-compliance copilot. Kimi reads documents; deterministic Python decides everything with legal or numeric consequences. Human gate before commit.
+Autonomous audit and Indian tax-compliance copilot. Argon reads documents; deterministic Python decides everything with legal or numeric consequences. Human gate before commit.
 
 ## Module ownership
 Dev A: `db/`, `llm/`, `extraction/`, `matching/`, `pipeline/`, `api/`, `scripts/`, `data/golden` generation
@@ -11,7 +11,7 @@ Shared (PR from both): `domain/models.py`, `pyproject.toml`, `uv.lock`, `AGENTS.
 ## Architecture rules
 - `domain/models.py` is the contract. Never pass raw dicts across module boundaries.
 - Money is `Decimal`, serialised as `str`. Never `float`. Quantize explicitly.
-- ONLY `llm/` may import the Kimi client. `tax/`, `accounting/`, `matching/`, `audit/` must not.
+- ONLY `llm/` may import the Argon client. `tax/`, `accounting/`, `matching/`, `audit/` must not.
 - Bank data must never be passed to any LLM function. No exceptions.
 - Tax thresholds, caps, section numbers and categories live in YAML under `tax/rules/`. NEVER hardcode or guess a number from memory. If unsure, leave the YAML value as `None` and add a note to `docs/rules-notes.md`.
 - Every rule has `ref_1961` and `ref_2025` (null allowed). UI prints `"Mapping pending"` for null.
