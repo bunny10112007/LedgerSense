@@ -2083,7 +2083,7 @@ export const initialAuditEvents: AuditEvent[] = [
     "actor": "system",
     "action": "EXTRACTION",
     "entity_id": "run:2025-26-demo",
-    "reason": "Extracted 16 receipts via Kimi perception replay",
+    "reason": "Extracted 16 receipts via Argon perception replay",
     "payload_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
@@ -2146,7 +2146,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:001",
       "ts": "2026-03-31T09:00:01Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2156,7 +2156,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:002",
       "ts": "2026-03-31T09:00:02Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2166,7 +2166,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:003",
       "ts": "2026-03-31T09:00:03Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2176,7 +2176,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:004",
       "ts": "2026-03-31T09:00:04Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2186,7 +2186,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:005",
       "ts": "2026-03-31T09:00:05Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2196,7 +2196,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:006",
       "ts": "2026-03-31T09:00:06Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2206,7 +2206,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:007",
       "ts": "2026-03-31T09:00:07Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2216,7 +2216,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:008",
       "ts": "2026-03-31T09:00:08Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2226,7 +2226,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:009",
       "ts": "2026-03-31T09:00:09Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2236,7 +2236,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:010",
       "ts": "2026-03-31T09:00:10Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2246,7 +2246,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:011",
       "ts": "2026-03-31T09:00:11Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2256,7 +2256,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:012",
       "ts": "2026-03-31T09:00:12Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2266,7 +2266,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:013",
       "ts": "2026-03-31T09:00:13Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2276,7 +2276,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:014",
       "ts": "2026-03-31T09:00:14Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2286,7 +2286,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:015",
       "ts": "2026-03-31T09:00:15Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,
@@ -2296,7 +2296,7 @@ export const initialEgress: EgressResponse = {
     {
       "id": "egress:016",
       "ts": "2026-03-31T09:00:16Z",
-      "model": "moonshot-v1-vision (Kimi)",
+      "model": "argon-vision-v1 (Argon)",
       "bytes_sent": 15312,
       "est_cost": "0.005",
       "pii_masked": true,

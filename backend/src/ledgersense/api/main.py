@@ -102,7 +102,7 @@ def health_check() -> dict[str, str]:
     return {
         "status": "ok",
         "llm_mode": settings.LLM_MODE,
-        "model_id": settings.KIMI_MODEL,
+        "model_id": settings.ARGON_MODEL,
     }
 
 

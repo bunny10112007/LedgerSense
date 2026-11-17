@@ -76,6 +76,7 @@ def test_full_pipeline_api_lifecycle(monkeypatch: pytest.MonkeyPatch) -> None:
     health_data = resp.json()
     assert health_data["status"] == "ok"
     assert health_data["llm_mode"] == "replay"
+    assert health_data["model_id"] == "argon-vision-v1"
 
     # 2. Create Run
     create_run_payload = {

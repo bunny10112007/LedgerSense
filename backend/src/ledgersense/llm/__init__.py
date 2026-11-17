@@ -1,3 +1,4 @@
+from ledgersense.llm.argon_provider import ArgonProvider
 from ledgersense.llm.cache import CacheMissError, ExtractionCache
 from ledgersense.llm.egress import log_outbound_call
 from ledgersense.llm.kimi_provider import KimiProvider
@@ -7,6 +8,7 @@ from ledgersense.llm.provider import Provider, RawExtraction
 
 __all__ = [
     "PROMPT_VERSION",
+    "ArgonProvider",
     "CacheMissError",
     "ExtractionCache",
     "KimiProvider",

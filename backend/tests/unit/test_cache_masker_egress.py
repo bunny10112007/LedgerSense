@@ -13,6 +13,7 @@ from ledgersense.core.config import settings
 from ledgersense.db.models import AuditEventRecord, EgressLogRecord
 from ledgersense.db.session import engine, init_db
 from ledgersense.extraction.extractor import ReceiptExtractor, compute_vendor_key
+from ledgersense.llm.argon_provider import ArgonProvider
 from ledgersense.llm.cache import CacheMissError, ExtractionCache
 from ledgersense.llm.egress import log_outbound_call
 from ledgersense.llm.kimi_provider import KimiProvider
@@ -347,7 +348,9 @@ def test_kimi_provider_backoff_retry_on_rate_limit(
     assert res.raw_json == json.dumps({"doc_type": "receipt"})
 
 
-def test_kimi_provider_semaphore_concurrency() -> None:
-    """Verify semaphore of 4 limits in-flight requests."""
-    provider = KimiProvider(client=MagicMock())
-    assert provider.semaphore._value == 4
+def test_argon_and_kimi_provider_semaphore_concurrency() -> None:
+    """Verify semaphore of 4 limits in-flight requests for Argon and Kimi providers."""
+    argon_prov = ArgonProvider(client=MagicMock())
+    assert argon_prov.semaphore._value == 4
+    kimi_prov = KimiProvider(client=MagicMock())
+    assert kimi_prov.semaphore._value == 4

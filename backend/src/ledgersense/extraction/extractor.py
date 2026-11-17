@@ -16,9 +16,9 @@ from ledgersense.extraction.checks import (
     run_arithmetic_checks,
 )
 from ledgersense.extraction.normalise import compute_vendor_key
+from ledgersense.llm.argon_provider import ArgonProvider
 from ledgersense.llm.cache import CacheMissError, ExtractionCache
 from ledgersense.llm.egress import log_outbound_call
-from ledgersense.llm.kimi_provider import KimiProvider
 from ledgersense.llm.pii import mask_pii
 from ledgersense.llm.prompts import PROMPT_VERSION
 from ledgersense.llm.provider import Provider, RawExtraction
@@ -44,7 +44,7 @@ class ReceiptExtractor:
         provider: Provider | None = None,
         cache: ExtractionCache | None = None,
     ) -> None:
-        self.provider = provider or KimiProvider()
+        self.provider = provider or ArgonProvider()
         self.cache = cache or ExtractionCache()
 
     def extract_document(

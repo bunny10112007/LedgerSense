@@ -457,7 +457,7 @@ def main() -> None:
             json.dump(
                 {
                     "file_hash": file_hash,
-                    "model_id": "moonshot-v1-8k-vision-preview",
+                    "model_id": "argon-vision-v1",
                     "prompt_version": "v1",
                     "response_json": json.dumps(receipt),
                 },
