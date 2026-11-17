@@ -13,7 +13,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 
-def get_font(size: int = 20, bold: bool = False) -> ImageFont.ImageFont | ImageFont.FreeTypeFont:
+def get_font(
+    size: int = 20, bold: bool = False
+) -> ImageFont.ImageFont | ImageFont.FreeTypeFont:
     """Try to load a readable truetype font, fallback to default."""
     try:
         # Common Windows fonts
@@ -48,24 +50,46 @@ def render_receipt_image(receipt_data: dict, output_path: Path) -> None:
 
     # Document Header / Type
     doc_type_title = receipt_data.get("doc_type", "INVOICE").replace("_", " ").upper()
-    draw.text((width // 2, y), doc_type_title, fill="#0F172A", font=header_font, anchor="mm")
+    draw.text(
+        (width // 2, y), doc_type_title, fill="#0F172A", font=header_font, anchor="mm"
+    )
     y += 40
 
     # Vendor Name
     vendor_name = receipt_data.get("vendor_name", "RETAIL MERCHANT")
-    draw.text((width // 2, y), vendor_name, fill="#0F172A", font=title_font, anchor="mm")
+    draw.text(
+        (width // 2, y), vendor_name, fill="#0F172A", font=title_font, anchor="mm"
+    )
     y += 35
 
     # Vendor GSTIN & Details
     gstin = receipt_data.get("vendor_gstin")
     if gstin:
-        draw.text((width // 2, y), f"GSTIN: {gstin}", fill="#1E293B", font=bold_font, anchor="mm")
+        draw.text(
+            (width // 2, y),
+            f"GSTIN: {gstin}",
+            fill="#1E293B",
+            font=bold_font,
+            anchor="mm",
+        )
         y += 28
     else:
-        draw.text((width // 2, y), "(Unregistered Dealer / Non-GST Entity)", fill="#64748B", font=mono_font, anchor="mm")
+        draw.text(
+            (width // 2, y),
+            "(Unregistered Dealer / Non-GST Entity)",
+            fill="#64748B",
+            font=mono_font,
+            anchor="mm",
+        )
         y += 28
 
-    draw.text((width // 2, y), "Tax Invoice / Payment Voucher / Commercial Receipt", fill="#64748B", font=mono_font, anchor="mm")
+    draw.text(
+        (width // 2, y),
+        "Tax Invoice / Payment Voucher / Commercial Receipt",
+        fill="#64748B",
+        font=mono_font,
+        anchor="mm",
+    )
     y += 25
 
     draw.line([(40, y), (width - 40, y)], fill="#CBD5E1", width=2)
@@ -77,10 +101,19 @@ def render_receipt_image(receipt_data: dict, output_path: Path) -> None:
     pay_mode = (receipt_data.get("payment_mode") or "UNKNOWN").upper()
 
     draw.text((50, y), f"Invoice / Slip No: {inv_no}", fill="#0F172A", font=bold_font)
-    draw.text((50, y + 30), f"Date of Issue:    {inv_date}", fill="#0F172A", font=bold_font)
+    draw.text(
+        (50, y + 30), f"Date of Issue:    {inv_date}", fill="#0F172A", font=bold_font
+    )
 
-    draw.text((width - 320, y), f"Payment Mode: {pay_mode}", fill="#0F172A", font=bold_font)
-    draw.text((width - 320, y + 30), f"Place of Supply: Rajasthan (08)", fill="#334155", font=regular_font)
+    draw.text(
+        (width - 320, y), f"Payment Mode: {pay_mode}", fill="#0F172A", font=bold_font
+    )
+    draw.text(
+        (width - 320, y + 30),
+        "Place of Supply: Rajasthan (08)",
+        fill="#334155",
+        font=regular_font,
+    )
     y += 85
 
     # Table Header
@@ -88,7 +121,9 @@ def render_receipt_image(receipt_data: dict, output_path: Path) -> None:
     draw.text((55, y + 8), "Description", fill="#0F172A", font=bold_font)
     draw.text((480, y + 8), "HSN/SAC", fill="#0F172A", font=bold_font)
     draw.text((600, y + 8), "Qty", fill="#0F172A", font=bold_font)
-    draw.text((width - 60, y + 8), "Amount (INR)", fill="#0F172A", font=bold_font, anchor="ra")
+    draw.text(
+        (width - 60, y + 8), "Amount (INR)", fill="#0F172A", font=bold_font, anchor="ra"
+    )
     y += 45
 
     # Line items
@@ -119,36 +154,97 @@ def render_receipt_image(receipt_data: dict, output_path: Path) -> None:
     summary_x_val = width - 60
 
     if subtotal > 0:
-        draw.text((summary_x_label, y), "Subtotal (Taxable):", fill="#475569", font=regular_font)
-        draw.text((summary_x_val, y), f"INR {subtotal:,.2f}", fill="#0F172A", font=bold_font, anchor="ra")
+        draw.text(
+            (summary_x_label, y),
+            "Subtotal (Taxable):",
+            fill="#475569",
+            font=regular_font,
+        )
+        draw.text(
+            (summary_x_val, y),
+            f"INR {subtotal:,.2f}",
+            fill="#0F172A",
+            font=bold_font,
+            anchor="ra",
+        )
         y += 30
 
     if cgst > 0:
-        draw.text((summary_x_label, y), "CGST (Central Tax):", fill="#475569", font=regular_font)
-        draw.text((summary_x_val, y), f"INR {cgst:,.2f}", fill="#0F172A", font=bold_font, anchor="ra")
+        draw.text(
+            (summary_x_label, y),
+            "CGST (Central Tax):",
+            fill="#475569",
+            font=regular_font,
+        )
+        draw.text(
+            (summary_x_val, y),
+            f"INR {cgst:,.2f}",
+            fill="#0F172A",
+            font=bold_font,
+            anchor="ra",
+        )
         y += 28
 
     if sgst > 0:
-        draw.text((summary_x_label, y), "SGST (State Tax):", fill="#475569", font=regular_font)
-        draw.text((summary_x_val, y), f"INR {sgst:,.2f}", fill="#0F172A", font=bold_font, anchor="ra")
+        draw.text(
+            (summary_x_label, y), "SGST (State Tax):", fill="#475569", font=regular_font
+        )
+        draw.text(
+            (summary_x_val, y),
+            f"INR {sgst:,.2f}",
+            fill="#0F172A",
+            font=bold_font,
+            anchor="ra",
+        )
         y += 28
 
     if igst > 0:
-        draw.text((summary_x_label, y), "IGST (Integrated Tax):", fill="#475569", font=regular_font)
-        draw.text((summary_x_val, y), f"INR {igst:,.2f}", fill="#0F172A", font=bold_font, anchor="ra")
+        draw.text(
+            (summary_x_label, y),
+            "IGST (Integrated Tax):",
+            fill="#475569",
+            font=regular_font,
+        )
+        draw.text(
+            (summary_x_val, y),
+            f"INR {igst:,.2f}",
+            fill="#0F172A",
+            font=bold_font,
+            anchor="ra",
+        )
         y += 28
 
     # Final Total Box
     y += 10
     draw.rectangle([(summary_x_label - 15, y), (width - 40, y + 48)], fill="#0F172A")
-    draw.text((summary_x_label, y + 12), "GRAND TOTAL:", fill="#FFFFFF", font=header_font)
-    draw.text((summary_x_val, y + 12), f"INR {total:,.2f}", fill="#FFFFFF", font=header_font, anchor="ra")
+    draw.text(
+        (summary_x_label, y + 12), "GRAND TOTAL:", fill="#FFFFFF", font=header_font
+    )
+    draw.text(
+        (summary_x_val, y + 12),
+        f"INR {total:,.2f}",
+        fill="#FFFFFF",
+        font=header_font,
+        anchor="ra",
+    )
     y += 80
 
     # Verification and Footer Notes
-    draw.text((width // 2, y), f"Certified Original Document · Code: {receipt_data.get('id', '')}", fill="#64748B", font=mono_font, anchor="mm")
+    draw.text(
+        (width // 2, y),
+        f"Certified Original Document · Code: {receipt_data.get('id', '')}",
+        fill="#64748B",
+        font=mono_font,
+        anchor="mm",
+    )
     y += 25
-    draw.text((width // 2, y), "Generated synthetically for LedgerSense Benchmark & Demo", fill="#94A3B8", font=mono_font, anchor="mm")
+    draw.text(
+        (width // 2, y),
+        "Generated synthetically for LedgerSense Benchmark & Demo",
+        fill="#94A3B8",
+        font=mono_font,
+        anchor="mm",
+    )
 
     image.save(output_path, "PNG")
 
@@ -157,37 +253,149 @@ def generate_bank_csv(csv_path: Path) -> None:
     """Generate the synthetic bank statement CSV matching Section 10."""
     rows = [
         # G01
-        {"date": "2025-06-12", "narration": "UPI/ARAVALI STATIONERS/INV2041", "ref_no": "UPI902812", "debit": "11800.00", "credit": "0.00", "balance": "188200.00"},
+        {
+            "date": "2025-06-12",
+            "narration": "UPI/ARAVALI STATIONERS/INV2041",
+            "ref_no": "UPI902812",
+            "debit": "11800.00",
+            "credit": "0.00",
+            "balance": "188200.00",
+        },
         # G02 (bank date +1 day)
-        {"date": "2025-07-04", "narration": "POS/PINK CITY FUELS/7781", "ref_no": "POS889102", "debit": "3200.00", "credit": "0.00", "balance": "185000.00"},
+        {
+            "date": "2025-07-04",
+            "narration": "POS/PINK CITY FUELS/7781",
+            "ref_no": "POS889102",
+            "debit": "3200.00",
+            "credit": "0.00",
+            "balance": "185000.00",
+        },
         # Credit Line 1 (client receipt, matching must ignore)
-        {"date": "2025-07-15", "narration": "NEFT/CLIENT INVOICE SETTLEMENT C-101", "ref_no": "NEFT29841", "debit": "0.00", "credit": "50000.00", "balance": "235000.00"},
+        {
+            "date": "2025-07-15",
+            "narration": "NEFT/CLIENT INVOICE SETTLEMENT C-101",
+            "ref_no": "NEFT29841",
+            "debit": "0.00",
+            "credit": "50000.00",
+            "balance": "235000.00",
+        },
         # G03
-        {"date": "2025-08-01", "narration": "NEFT/CLOUDNIMBUS SOFTWARE", "ref_no": "NEFT33910", "debit": "5900.00", "credit": "0.00", "balance": "229100.00"},
+        {
+            "date": "2025-08-01",
+            "narration": "NEFT/CLOUDNIMBUS SOFTWARE",
+            "ref_no": "NEFT33910",
+            "debit": "5900.00",
+            "credit": "0.00",
+            "balance": "229100.00",
+        },
         # G04
-        {"date": "2025-09-14", "narration": "POS/SPICE ROUTE RESTAURANT", "ref_no": "POS440211", "debit": "2100.00", "credit": "0.00", "balance": "227000.00"},
+        {
+            "date": "2025-09-14",
+            "narration": "POS/SPICE ROUTE RESTAURANT",
+            "ref_no": "POS440211",
+            "debit": "2100.00",
+            "credit": "0.00",
+            "balance": "227000.00",
+        },
         # G05
-        {"date": "2025-10-06", "narration": "UPI/QUICKCAB MOBILITY/5529", "ref_no": "UPI552901", "debit": "640.00", "credit": "0.00", "balance": "226360.00"},
+        {
+            "date": "2025-10-06",
+            "narration": "UPI/QUICKCAB MOBILITY/5529",
+            "ref_no": "UPI552901",
+            "debit": "640.00",
+            "credit": "0.00",
+            "balance": "226360.00",
+        },
         # G14 (receipt 4130.00 on 2025-11-05; bank debit 4128.00 on 2025-11-08; amount delta -2.00)
-        {"date": "2025-11-08", "narration": "NEFT/DESKCRAFT FURNITURE", "ref_no": "NEFT77102", "debit": "4128.00", "credit": "0.00", "balance": "222232.00"},
+        {
+            "date": "2025-11-08",
+            "narration": "NEFT/DESKCRAFT FURNITURE",
+            "ref_no": "NEFT77102",
+            "debit": "4128.00",
+            "credit": "0.00",
+            "balance": "222232.00",
+        },
         # Credit Line 2 (client receipt, matching must ignore)
-        {"date": "2025-11-25", "narration": "RTGS/CLIENT RETAINER PAYMENT C-102", "ref_no": "RTGS99210", "debit": "0.00", "credit": "75000.00", "balance": "297232.00"},
+        {
+            "date": "2025-11-25",
+            "narration": "RTGS/CLIENT RETAINER PAYMENT C-102",
+            "ref_no": "RTGS99210",
+            "debit": "0.00",
+            "credit": "75000.00",
+            "balance": "297232.00",
+        },
         # G10
-        {"date": "2025-12-02", "narration": "NEFT/METRO PRINT HOUSE", "ref_no": "NEFT11890", "debit": "23600.00", "credit": "0.00", "balance": "273632.00"},
+        {
+            "date": "2025-12-02",
+            "narration": "NEFT/METRO PRINT HOUSE",
+            "ref_no": "NEFT11890",
+            "debit": "23600.00",
+            "credit": "0.00",
+            "balance": "273632.00",
+        },
         # G15a (receipt 2025-12-03, bank 2025-12-04)
-        {"date": "2025-12-04", "narration": "NEFT/ARAVALI STATIONERS/2102", "ref_no": "NEFT21021", "debit": "7080.00", "credit": "0.00", "balance": "266552.00"},
+        {
+            "date": "2025-12-04",
+            "narration": "NEFT/ARAVALI STATIONERS/2102",
+            "ref_no": "NEFT21021",
+            "debit": "7080.00",
+            "credit": "0.00",
+            "balance": "266552.00",
+        },
         # G15b (receipt 2025-12-05, bank 2025-12-06)
-        {"date": "2025-12-06", "narration": "NEFT/ARAVALI STATIONERS/2105", "ref_no": "NEFT21051", "debit": "7080.00", "credit": "0.00", "balance": "259472.00"},
+        {
+            "date": "2025-12-06",
+            "narration": "NEFT/ARAVALI STATIONERS/2105",
+            "ref_no": "NEFT21051",
+            "debit": "7080.00",
+            "credit": "0.00",
+            "balance": "259472.00",
+        },
         # G11
-        {"date": "2026-01-15", "narration": "ACH/BHARAT LIFE INSURANCE/99231", "ref_no": "ACH992310", "debit": "30000.00", "credit": "0.00", "balance": "229472.00"},
+        {
+            "date": "2026-01-15",
+            "narration": "ACH/BHARAT LIFE INSURANCE/99231",
+            "ref_no": "ACH992310",
+            "debit": "30000.00",
+            "credit": "0.00",
+            "balance": "229472.00",
+        },
         # G12
-        {"date": "2026-01-22", "narration": "UPI/SUNRISE AUTO CARE/3307", "ref_no": "UPI330799", "debit": "5900.00", "credit": "0.00", "balance": "223572.00"},
+        {
+            "date": "2026-01-22",
+            "narration": "UPI/SUNRISE AUTO CARE/3307",
+            "ref_no": "UPI330799",
+            "debit": "5900.00",
+            "credit": "0.00",
+            "balance": "223572.00",
+        },
         # G08
-        {"date": "2026-02-10", "narration": "NEFT/SHIELD HEALTH INSURANCE/6512", "ref_no": "NEFT65120", "debit": "18000.00", "credit": "0.00", "balance": "205572.00"},
+        {
+            "date": "2026-02-10",
+            "narration": "NEFT/SHIELD HEALTH INSURANCE/6512",
+            "ref_no": "NEFT65120",
+            "debit": "18000.00",
+            "credit": "0.00",
+            "balance": "205572.00",
+        },
         # Bank-only trap: debit 9999.00 on 2026-03-05
-        {"date": "2026-03-05", "narration": "UPI/UNKNOWN PAYEE", "ref_no": "UPI999999", "debit": "9999.00", "credit": "0.00", "balance": "195573.00"},
+        {
+            "date": "2026-03-05",
+            "narration": "UPI/UNKNOWN PAYEE",
+            "ref_no": "UPI999999",
+            "debit": "9999.00",
+            "credit": "0.00",
+            "balance": "195573.00",
+        },
         # G07 (dated 2026-04-12, bank line on 2026-04-13)
-        {"date": "2026-04-13", "narration": "NEFT/SHIELD HEALTH INSURANCE/8801", "ref_no": "NEFT88010", "debit": "24000.00", "credit": "0.00", "balance": "171573.00"},
+        {
+            "date": "2026-04-13",
+            "narration": "NEFT/SHIELD HEALTH INSURANCE/8801",
+            "ref_no": "NEFT88010",
+            "debit": "24000.00",
+            "credit": "0.00",
+            "balance": "171573.00",
+        },
     ]
 
     with open(csv_path, mode="w", newline="", encoding="utf-8") as f:
@@ -237,7 +445,9 @@ def main() -> None:
         fname = file_map.get(rcpt_id, f"{rcpt_id.replace('rcpt:', '').lower()}.png")
         out_file = receipts_dir / fname
         render_receipt_image(receipt, out_file)
-        print(f"  [OK] Rendered {fname} ({receipt['vendor_name']} - INR {receipt['total']})")
+        print(
+            f"  [OK] Rendered {fname} ({receipt['vendor_name']} - INR {receipt['total']})"
+        )
 
         # Cache fixture for replay mode
         img_bytes = out_file.read_bytes()
@@ -258,7 +468,9 @@ def main() -> None:
     bank_csv_path = golden_dir / "bank.csv"
     print(f"\nGenerating {bank_csv_path}...")
     generate_bank_csv(bank_csv_path)
-    print("  [OK] bank.csv generated with 16 lines (14 debits including 9,999.00 trap, 2 credit lines)")
+    print(
+        "  [OK] bank.csv generated with 16 lines (14 debits including 9,999.00 trap, 2 credit lines)"
+    )
 
 
 if __name__ == "__main__":

@@ -26,13 +26,11 @@ class Provider(Protocol):
         mime: str = "image/png",
         hints: dict[str, Any] | None = None,
         error_feedback: str | None = None,
-    ) -> RawExtraction:
-        ...
+    ) -> RawExtraction: ...
 
     def structure_text(
         self,
         masked_text: str,
         hints: dict[str, Any] | None = None,
         error_feedback: str | None = None,
-    ) -> RawExtraction:
-        ...
+    ) -> RawExtraction: ...

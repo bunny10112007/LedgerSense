@@ -12,6 +12,7 @@ def ensure_utc(dt: datetime | None) -> datetime | None:
         return dt.replace(tzinfo=UTC)
     return dt
 
+
 from ledgersense.db.models import (
     AuditEventRecord,
     BankLineRecord,
@@ -164,7 +165,9 @@ class Repository:
                 score=m.score,
                 kind=m.kind,
                 date_delta_days=m.date_delta_days,
-                amount_delta=str(m.amount_delta) if m.amount_delta is not None else None,
+                amount_delta=str(m.amount_delta)
+                if m.amount_delta is not None
+                else None,
             )
             self.session.add(record)
         self.session.commit()
@@ -209,7 +212,9 @@ class Repository:
             self.session.add(record)
         self.session.commit()
 
-    def get_risk_flags(self, run_id: str, status: str | None = None) -> list[RiskFlagRecord]:
+    def get_risk_flags(
+        self, run_id: str, status: str | None = None
+    ) -> list[RiskFlagRecord]:
         statement = select(RiskFlagRecord).where(RiskFlagRecord.run_id == run_id)
         if status:
             statement = statement.where(RiskFlagRecord.status == status)
@@ -276,7 +281,9 @@ class Repository:
     def get_journal_entries(
         self, run_id: str, status: str | None = None
     ) -> list[JournalEntryRecord]:
-        statement = select(JournalEntryRecord).where(JournalEntryRecord.run_id == run_id)
+        statement = select(JournalEntryRecord).where(
+            JournalEntryRecord.run_id == run_id
+        )
         if status:
             statement = statement.where(JournalEntryRecord.status == status)
         return list(self.session.exec(statement).all())
@@ -371,7 +378,9 @@ class Repository:
     def get_extraction_cache(
         self, file_hash: str, model_id: str, prompt_version: str
     ) -> str | None:
-        record = self.session.get(ExtractionCacheRecord, (file_hash, model_id, prompt_version))
+        record = self.session.get(
+            ExtractionCacheRecord, (file_hash, model_id, prompt_version)
+        )
         return record.response_json if record else None
 
     def put_extraction_cache(

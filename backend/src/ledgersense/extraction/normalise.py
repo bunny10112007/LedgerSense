@@ -32,5 +32,9 @@ def compute_vendor_key(vendor_name: str | None, vendor_gstin: str | None) -> str
             words.pop()
         slug = "-".join(words) if words else "unknown"
 
-    gstin_part = vendor_gstin.strip().upper() if vendor_gstin and vendor_gstin.strip() else "nogstin"
+    gstin_part = (
+        vendor_gstin.strip().upper()
+        if vendor_gstin and vendor_gstin.strip()
+        else "nogstin"
+    )
     return f"{slug}|{gstin_part}"

@@ -9,7 +9,9 @@ from ledgersense.core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     echo=False,
-    connect_args={"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {},
+    connect_args={"check_same_thread": False}
+    if settings.DATABASE_URL.startswith("sqlite")
+    else {},
 )
 
 
