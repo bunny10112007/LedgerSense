@@ -84,7 +84,10 @@ def main() -> None:
         print("\nSmoke test PASSED. Kimi live vision successfully parsed receipt.")
     except Exception as e:
         err_msg = str(e)
-        print(f"\n[LIVE API ERROR] Call failed: {type(e).__name__}: {err_msg}", file=sys.stderr)
+        print(
+            f"\n[LIVE API ERROR] Call failed: {type(e).__name__}: {err_msg}",
+            file=sys.stderr,
+        )
         if "401" in err_msg or "authentication" in err_msg.lower():
             print(
                 "[LIMITATION DETECTED] Moonshot platform returned 401 Invalid Authentication. "
@@ -101,10 +104,14 @@ def main() -> None:
         repo_root = Path(__file__).resolve().parents[1]
         expected_path = repo_root / "data" / "golden" / "expected_receipts.json"
         if expected_path.exists():
-            print("\n[REPLAY FALLBACK] Demonstrating pipeline with golden fixture for g01.png:")
+            print(
+                "\n[REPLAY FALLBACK] Demonstrating pipeline with golden fixture for g01.png:"
+            )
             with open(expected_path, encoding="utf-8") as f:
                 expected_list = json.load(f)
-            g01_data = next((r for r in expected_list if r.get("id") == "rcpt:G01"), None)
+            g01_data = next(
+                (r for r in expected_list if r.get("id") == "rcpt:G01"), None
+            )
             if g01_data:
                 parsed_receipt = ExtractedReceipt.model_validate(g01_data)
                 print(f"Model ID:          {settings.KIMI_MODEL} (replay)")
@@ -113,7 +120,9 @@ def main() -> None:
                 print("Completion Tokens: 64 (synthetic)")
                 print("\n--- Parsed ExtractedReceipt ---")
                 print(json.dumps(parsed_receipt.model_dump(mode="json"), indent=2))
-                print("\nSmoke test completed with replay fallback. Parsed receipt verified.")
+                print(
+                    "\nSmoke test completed with replay fallback. Parsed receipt verified."
+                )
                 return
 
         sys.exit(1)

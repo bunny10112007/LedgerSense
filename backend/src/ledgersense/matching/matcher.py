@@ -57,7 +57,9 @@ def _compute_score(
 
     narration_overlap = _compute_narration_token_overlap(receipt, bank_line)
 
-    score = (0.5 * amount_closeness) + (0.3 * date_closeness) + (0.2 * narration_overlap)
+    score = (
+        (0.5 * amount_closeness) + (0.3 * date_closeness) + (0.2 * narration_overlap)
+    )
     return round(score, 4)
 
 
@@ -67,7 +69,11 @@ def match(
     cfg: RunConfig,
 ) -> list[Match]:
     """Execute deterministic 1:1 bank-to-receipt matching per Section 6.2."""
-    run_id = receipts[0].run_id if receipts else (bank_lines[0].run_id if bank_lines else "run:default")
+    run_id = (
+        receipts[0].run_id
+        if receipts
+        else (bank_lines[0].run_id if bank_lines else "run:default")
+    )
 
     # 1. Deduplicate receipts: exclude exact duplicate receipts
     # same vendor_key + total + invoice_date + invoice_no, keeping first occurrence
@@ -92,7 +98,10 @@ def match(
 
     # 2. Filter bank debit lines: ignore credit lines during expense matching
     eligible_bank_debits: list[BankLine] = [
-        b for b in bank_lines if b.debit > Decimal("0.00") and (b.credit == Decimal("0.00") or b.credit is None)
+        b
+        for b in bank_lines
+        if b.debit > Decimal("0.00")
+        and (b.credit == Decimal("0.00") or b.credit is None)
     ]
 
     # 3. Candidate generation: within amount_tolerance and date_window_days
@@ -132,7 +141,10 @@ def match(
             for i in range(len(c_list)):
                 for j in range(i + 1, len(c_list)):
                     c1, c2 = c_list[i], c_list[j]
-                    if c1["bank_line"].txn_date == c2["bank_line"].txn_date and abs(c1["score"] - c2["score"]) <= 0.02:
+                    if (
+                        c1["bank_line"].txn_date == c2["bank_line"].txn_date
+                        and abs(c1["score"] - c2["score"]) <= 0.02
+                    ):
                         ambiguous_receipts.add(r_id)
 
     # 5. Deterministic Greedy 1:1 Assignment

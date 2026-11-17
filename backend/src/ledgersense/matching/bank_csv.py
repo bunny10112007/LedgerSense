@@ -77,7 +77,9 @@ def parse(
     required_fields = ["txn_date", "narration", "debit", "credit"]
     missing = [f for f in required_fields if f not in field_to_col]
     if missing:
-        raise ValueError(f"Missing required bank CSV column mappings: {missing} (available: {reader.fieldnames})")
+        raise ValueError(
+            f"Missing required bank CSV column mappings: {missing} (available: {reader.fieldnames})"
+        )
 
     bank_lines: list[BankLine] = []
     for idx, row in enumerate(reader):

@@ -20,7 +20,9 @@ def log_outbound_call(
     session: Session | None = None,
 ) -> tuple[EgressLogRecord, AuditEventRecord]:
     """Record an outbound LLM call in both egress_log and audit_events."""
-    byte_count = len(payload_bytes) if isinstance(payload_bytes, bytes) else int(payload_bytes)
+    byte_count = (
+        len(payload_bytes) if isinstance(payload_bytes, bytes) else int(payload_bytes)
+    )
 
     if payload_raw is None:
         payload_data = f"{file_hash}:{model_id}:{byte_count}:{masked}".encode()

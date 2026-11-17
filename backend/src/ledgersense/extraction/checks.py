@@ -33,7 +33,9 @@ def run_arithmetic_checks(receipt: ExtractedReceipt) -> list[str]:
             )
 
     # 3. Intra-state CGST == SGST
-    if (receipt.cgst > Decimal("0.00") or receipt.sgst > Decimal("0.00")) and abs(receipt.cgst - receipt.sgst) > Decimal("0.05"):
+    if (receipt.cgst > Decimal("0.00") or receipt.sgst > Decimal("0.00")) and abs(
+        receipt.cgst - receipt.sgst
+    ) > Decimal("0.05"):
         messages.append(
             f"Intra-state GST mismatch: CGST ({receipt.cgst}) does not match SGST ({receipt.sgst})"
         )
@@ -57,6 +59,8 @@ def evaluate_confidence_status(
             conf = receipt.field_confidence.get(field)
             if conf is not None and conf < threshold:
                 status = "LOW_CONFIDENCE"
-                warnings.append(f"Low confidence on {field}: {conf:.2f} < {threshold:.2f}")
+                warnings.append(
+                    f"Low confidence on {field}: {conf:.2f} < {threshold:.2f}"
+                )
 
     return status, warnings

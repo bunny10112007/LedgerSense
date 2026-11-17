@@ -40,10 +40,24 @@ def test_journal_entry_balanced_succeeds():
         entry_date=date(2025, 6, 12),
         narration="Stationery purchase",
         lines=[
-            JournalLine(account_code="EXPENSE_STATIONERY", debit=Decimal("10000.00"), credit=Decimal("0.00")),
-            JournalLine(account_code="GST_INPUT_CGST", debit=Decimal("900.00"), credit=Decimal("0.00")),
-            JournalLine(account_code="GST_INPUT_SGST", debit=Decimal("900.00"), credit=Decimal("0.00")),
-            JournalLine(account_code="BANK", debit=Decimal("0.00"), credit=Decimal("11800.00")),
+            JournalLine(
+                account_code="EXPENSE_STATIONERY",
+                debit=Decimal("10000.00"),
+                credit=Decimal("0.00"),
+            ),
+            JournalLine(
+                account_code="GST_INPUT_CGST",
+                debit=Decimal("900.00"),
+                credit=Decimal("0.00"),
+            ),
+            JournalLine(
+                account_code="GST_INPUT_SGST",
+                debit=Decimal("900.00"),
+                credit=Decimal("0.00"),
+            ),
+            JournalLine(
+                account_code="BANK", debit=Decimal("0.00"), credit=Decimal("11800.00")
+            ),
         ],
     )
     assert entry.id == "je:0001"
@@ -60,8 +74,16 @@ def test_journal_entry_unbalanced_raises_validation_error():
             entry_date=date(2025, 6, 12),
             narration="Unbalanced entry",
             lines=[
-                JournalLine(account_code="EXPENSE_STATIONERY", debit=Decimal("10000.00"), credit=Decimal("0.00")),
-                JournalLine(account_code="BANK", debit=Decimal("0.00"), credit=Decimal("9000.00")),
+                JournalLine(
+                    account_code="EXPENSE_STATIONERY",
+                    debit=Decimal("10000.00"),
+                    credit=Decimal("0.00"),
+                ),
+                JournalLine(
+                    account_code="BANK",
+                    debit=Decimal("0.00"),
+                    credit=Decimal("9000.00"),
+                ),
             ],
         )
 
@@ -74,7 +96,11 @@ def test_journal_entry_insufficient_lines_raises_validation_error():
             entry_date=date(2025, 6, 12),
             narration="One line entry",
             lines=[
-                JournalLine(account_code="EXPENSE", debit=Decimal("500.00"), credit=Decimal("500.00")),
+                JournalLine(
+                    account_code="EXPENSE",
+                    debit=Decimal("500.00"),
+                    credit=Decimal("500.00"),
+                ),
             ],
         )
 
@@ -201,12 +227,16 @@ def test_run_model_and_allowed_transitions():
 def test_section_9_inter_module_models():
     # 1. GstinResult
     valid_gstin = GstinResult(ok=True)
-    invalid_gstin = GstinResult(ok=False, reason="bad checksum", expected_check_char="V")
+    invalid_gstin = GstinResult(
+        ok=False, reason="bad checksum", expected_check_char="V"
+    )
     assert valid_gstin.ok is True
     assert invalid_gstin.expected_check_char == "V"
 
     # 2. TrialBalance & Row
-    tb_row = TrialBalanceRow(account_code="BANK", debit=Decimal("0.00"), credit=Decimal("11800.00"))
+    tb_row = TrialBalanceRow(
+        account_code="BANK", debit=Decimal("0.00"), credit=Decimal("11800.00")
+    )
     tb = TrialBalance(
         accounts=[tb_row],
         total_debit=Decimal("11800.00"),

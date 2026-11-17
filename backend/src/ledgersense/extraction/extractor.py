@@ -26,7 +26,9 @@ from ledgersense.llm.provider import Provider, RawExtraction
 logger = logging.getLogger(__name__)
 
 
-def parse_extracted_receipt(raw_json: str) -> tuple[ExtractedReceipt | None, str | None]:
+def parse_extracted_receipt(
+    raw_json: str,
+) -> tuple[ExtractedReceipt | None, str | None]:
     """Parse raw JSON into ExtractedReceipt or return error string."""
     try:
         return ExtractedReceipt.model_validate_json(raw_json), None
@@ -121,12 +123,18 @@ class ReceiptExtractor:
         # Step 3: Parse and validate ExtractedReceipt with 1 retry on failure
         extracted, validation_error = parse_extracted_receipt(raw_extraction.raw_json)
         if validation_error:
-            logger.warning("First extraction attempt validation failed for %s: %s", rcpt_id, validation_error)
+            logger.warning(
+                "First extraction attempt validation failed for %s: %s",
+                rcpt_id,
+                validation_error,
+            )
 
         # Step 4: Retry ONCE if first attempt failed
         if extracted is None and validation_error is not None:
             if settings.LLM_MODE == "replay":
-                logger.warning("Replay mode: cannot retry live extraction for %s", rcpt_id)
+                logger.warning(
+                    "Replay mode: cannot retry live extraction for %s", rcpt_id
+                )
             else:
                 try:
                     retry_extraction = active_provider.extract_receipt(
@@ -143,7 +151,9 @@ class ReceiptExtractor:
                         run_id=run_id,
                         session=session,
                     )
-                    extracted, retry_error = parse_extracted_receipt(retry_extraction.raw_json)
+                    extracted, retry_error = parse_extracted_receipt(
+                        retry_extraction.raw_json
+                    )
                     if extracted is not None:
                         active_cache.put(
                             file_bytes=data_bytes,
@@ -153,9 +163,21 @@ class ReceiptExtractor:
                             session=session,
                         )
                     else:
-                        validation_error = f"{validation_error} | Retry parse error: {retry_error}"
-                except (OpenAIError, ValidationError, ValueError, json.JSONDecodeError, OSError) as retry_exc:
-                    logger.warning("Second extraction attempt failed for %s: %s", rcpt_id, retry_exc)
+                        validation_error = (
+                            f"{validation_error} | Retry parse error: {retry_error}"
+                        )
+                except (
+                    OpenAIError,
+                    ValidationError,
+                    ValueError,
+                    json.JSONDecodeError,
+                    OSError,
+                ) as retry_exc:
+                    logger.warning(
+                        "Second extraction attempt failed for %s: %s",
+                        rcpt_id,
+                        retry_exc,
+                    )
                     validation_error = f"{validation_error} | Retry error: {retry_exc}"
 
         # Step 5: Construct Receipt
@@ -258,11 +280,17 @@ class ReceiptExtractor:
 
         extracted, validation_error = parse_extracted_receipt(raw_extraction.raw_json)
         if validation_error:
-            logger.warning("First text extraction attempt validation failed for %s: %s", rcpt_id, validation_error)
+            logger.warning(
+                "First text extraction attempt validation failed for %s: %s",
+                rcpt_id,
+                validation_error,
+            )
 
         if extracted is None and validation_error is not None:
             if settings.LLM_MODE == "replay":
-                logger.warning("Replay mode: cannot retry text extraction for %s", rcpt_id)
+                logger.warning(
+                    "Replay mode: cannot retry text extraction for %s", rcpt_id
+                )
             else:
                 try:
                     retry_extraction = active_provider.structure_text(
@@ -279,7 +307,9 @@ class ReceiptExtractor:
                         payload_raw=masked_text,
                         session=session,
                     )
-                    extracted, retry_error = parse_extracted_receipt(retry_extraction.raw_json)
+                    extracted, retry_error = parse_extracted_receipt(
+                        retry_extraction.raw_json
+                    )
                     if extracted is not None:
                         active_cache.put(
                             file_bytes=text_bytes,
@@ -289,8 +319,16 @@ class ReceiptExtractor:
                             session=session,
                         )
                     else:
-                        validation_error = f"{validation_error} | Retry parse error: {retry_error}"
-                except (OpenAIError, ValidationError, ValueError, json.JSONDecodeError, OSError) as retry_exc:
+                        validation_error = (
+                            f"{validation_error} | Retry parse error: {retry_error}"
+                        )
+                except (
+                    OpenAIError,
+                    ValidationError,
+                    ValueError,
+                    json.JSONDecodeError,
+                    OSError,
+                ) as retry_exc:
                     validation_error = f"{validation_error} | Retry error: {retry_exc}"
 
         if extracted is None:

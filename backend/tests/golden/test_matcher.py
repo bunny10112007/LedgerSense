@@ -48,11 +48,15 @@ def test_golden_replay_extraction_and_matcher(monkeypatch: pytest.MonkeyPatch) -
         assert receipt.extraction_status in ("OK", "LOW_CONFIDENCE")
         extracted_receipts.append(receipt)
 
-    assert len(extracted_receipts) == 16, "All 16 receipts must be extracted cleanly from replay cache"
+    assert len(extracted_receipts) == 16, (
+        "All 16 receipts must be extracted cleanly from replay cache"
+    )
 
     # 2. Parse bank CSV
     bank_lines = parse_bank_csv(bank_csv_path, run_id="run:2025-26-demo")
-    assert len(bank_lines) == 16, "bank.csv must contain 16 lines (14 debits + 2 credits)"
+    assert len(bank_lines) == 16, (
+        "bank.csv must contain 16 lines (14 debits + 2 credits)"
+    )
 
     # 3. Execute matching
     cfg = RunConfig(
@@ -74,7 +78,9 @@ def test_golden_replay_extraction_and_matcher(monkeypatch: pytest.MonkeyPatch) -
     assert len(unmatched_bank) == answer_key["summary"]["unmatched_bank_debits_count"]
 
     # (a) Assert 13 MATCHED pairs
-    assert len(matched_pairs) == 13, f"Expected 13 MATCHED pairs, got {len(matched_pairs)}"
+    assert len(matched_pairs) == 13, (
+        f"Expected 13 MATCHED pairs, got {len(matched_pairs)}"
+    )
     matched_receipt_ids = {m.receipt_id for m in matched_pairs}
     expected_matched_ids = {
         "rcpt:G01",
@@ -94,9 +100,15 @@ def test_golden_replay_extraction_and_matcher(monkeypatch: pytest.MonkeyPatch) -
     assert matched_receipt_ids == expected_matched_ids
 
     # (b) Assert G06 (duplicate), G09 (cash), and G13 (cash) are excluded from bank matching
-    assert "rcpt:G06" not in matched_receipt_ids, "G06 exact duplicate must be excluded from bank matching"
-    assert "rcpt:G09" not in matched_receipt_ids, "G09 cash receipt must be excluded from bank matching"
-    assert "rcpt:G13" not in matched_receipt_ids, "G13 cash receipt must be excluded from bank matching"
+    assert "rcpt:G06" not in matched_receipt_ids, (
+        "G06 exact duplicate must be excluded from bank matching"
+    )
+    assert "rcpt:G09" not in matched_receipt_ids, (
+        "G09 cash receipt must be excluded from bank matching"
+    )
+    assert "rcpt:G13" not in matched_receipt_ids, (
+        "G13 cash receipt must be excluded from bank matching"
+    )
 
     # Neither duplicate nor cash receipts should appear as UNMATCHED_RECEIPT
     unmatched_receipt_ids = {m.receipt_id for m in unmatched_receipts}
@@ -105,7 +117,9 @@ def test_golden_replay_extraction_and_matcher(monkeypatch: pytest.MonkeyPatch) -
     assert "rcpt:G13" not in unmatched_receipt_ids
 
     # (c) Assert 1 UNMATCHED_BANK (9999.00 debit on 2026-03-05)
-    assert len(unmatched_bank) == 1, f"Expected 1 UNMATCHED_BANK, got {len(unmatched_bank)}"
+    assert len(unmatched_bank) == 1, (
+        f"Expected 1 UNMATCHED_BANK, got {len(unmatched_bank)}"
+    )
     unmatched_bank_line_id = unmatched_bank[0].bank_line_id
     orphan_bank_line = next(b for b in bank_lines if b.id == unmatched_bank_line_id)
     assert orphan_bank_line.txn_date == date(2026, 3, 5)

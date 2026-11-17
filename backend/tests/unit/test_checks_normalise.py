@@ -12,10 +12,22 @@ from ledgersense.extraction.normalise import compute_vendor_key
 
 def test_normalise_vendor_key() -> None:
     """Test vendor_key slugification, corporate suffix removal, and GSTIN formatting."""
-    assert compute_vendor_key("Pink City Fuels", "08AAACP5678C1ZD") == "pink-city-fuels|08AAACP5678C1ZD"
-    assert compute_vendor_key("DeskCraft Furniture Pvt. Ltd.", "29AAACD9012L1ZI") == "deskcraft-furniture|29AAACD9012L1ZI"
-    assert compute_vendor_key("Shield Health Insurance Co. Ltd.", "27AAACS5678G1Z2") == "shield-health-insurance|27AAACS5678G1Z2"
-    assert compute_vendor_key("Tech Solutions LLP", "07AABCT1234D1ZE") == "tech-solutions|07AABCT1234D1ZE"
+    assert (
+        compute_vendor_key("Pink City Fuels", "08AAACP5678C1ZD")
+        == "pink-city-fuels|08AAACP5678C1ZD"
+    )
+    assert (
+        compute_vendor_key("DeskCraft Furniture Pvt. Ltd.", "29AAACD9012L1ZI")
+        == "deskcraft-furniture|29AAACD9012L1ZI"
+    )
+    assert (
+        compute_vendor_key("Shield Health Insurance Co. Ltd.", "27AAACS5678G1Z2")
+        == "shield-health-insurance|27AAACS5678G1Z2"
+    )
+    assert (
+        compute_vendor_key("Tech Solutions LLP", "07AABCT1234D1ZE")
+        == "tech-solutions|07AABCT1234D1ZE"
+    )
     assert compute_vendor_key("Local tea stall", None) == "local-tea-stall|nogstin"
     assert compute_vendor_key(None, None) == "unknown|nogstin"
 

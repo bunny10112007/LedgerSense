@@ -119,11 +119,15 @@ class ExtractionCache:
         session: Session | None = None,
     ) -> str | None:
         if session:
-            record = session.get(ExtractionCacheRecord, (file_hash, model_id, prompt_version))
+            record = session.get(
+                ExtractionCacheRecord, (file_hash, model_id, prompt_version)
+            )
             return record.response_json if record else None
         try:
             with Session(engine) as s:
-                record = s.get(ExtractionCacheRecord, (file_hash, model_id, prompt_version))
+                record = s.get(
+                    ExtractionCacheRecord, (file_hash, model_id, prompt_version)
+                )
                 return record.response_json if record else None
         except (SQLAlchemyError, OSError) as exc:
             logger.debug("Database cache lookup error: %s", exc)

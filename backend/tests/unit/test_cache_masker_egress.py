@@ -99,7 +99,9 @@ def test_egress_and_audit_logging() -> None:
         assert db_audit.action == "LLM_CALL"
 
 
-def test_cache_miss_in_replay_mode_raises_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_cache_miss_in_replay_mode_raises_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """In replay mode, a cache miss must raise CacheMissError and never call provider."""
     monkeypatch.setattr(settings, "LLM_MODE", "replay")
 
@@ -119,7 +121,9 @@ def test_cache_hit_returns_stored_data(tmp_path: Path) -> None:
     """ExtractionCache returns stored data from DB or filesystem."""
     cache = ExtractionCache(cache_dir=tmp_path)
     sample_bytes = b"known-document-bytes-sample"
-    sample_json = json.dumps({"doc_type": "gst_invoice", "vendor_name": "Test Vendor", "total": "500.00"})
+    sample_json = json.dumps(
+        {"doc_type": "gst_invoice", "vendor_name": "Test Vendor", "total": "500.00"}
+    )
 
     raw_ext = RawExtraction(
         raw_json=sample_json,
@@ -175,7 +179,9 @@ def test_extractor_cache_hit_zero_network_calls() -> None:
     test_bytes = b"already-cached-receipt-bytes"
 
     with Session(engine) as session:
-        receipt = extractor.extract_document(test_bytes, source_file="cached.png", session=session)
+        receipt = extractor.extract_document(
+            test_bytes, source_file="cached.png", session=session
+        )
 
         # Zero network calls to provider
         assert mock_provider.extract_receipt.call_count == 0
@@ -184,7 +190,9 @@ def test_extractor_cache_hit_zero_network_calls() -> None:
         assert receipt.vendor_key == "aravali-stationers|08AAAFA1234B1ZC"
 
 
-def test_extractor_retry_loop_on_validation_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_extractor_retry_loop_on_validation_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """On validation failure, extractor retries once with error feedback and succeeds if attempt 2 is valid."""
     monkeypatch.setattr(settings, "LLM_MODE", "live")
 
@@ -226,7 +234,9 @@ def test_extractor_retry_loop_on_validation_failure(monkeypatch: pytest.MonkeyPa
     test_img = b"simulated-image-bytes"
 
     with Session(engine) as session:
-        receipt = extractor.extract_document(test_img, source_file="g01.png", session=session)
+        receipt = extractor.extract_document(
+            test_img, source_file="g01.png", session=session
+        )
 
         # Assert two calls were made (initial + retry)
         assert mock_provider.extract_receipt.call_count == 2
@@ -240,7 +250,9 @@ def test_extractor_retry_loop_on_validation_failure(monkeypatch: pytest.MonkeyPa
         assert receipt.vendor_key == "aravali-stationers|08AAAFA1234B1ZC"
 
 
-def test_extractor_second_failure_marks_failed_without_crashing(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_extractor_second_failure_marks_failed_without_crashing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """When second attempt also fails validation, extractor marks status FAILED and does not crash batch."""
     monkeypatch.setattr(settings, "LLM_MODE", "live")
 
@@ -263,7 +275,9 @@ def test_extractor_second_failure_marks_failed_without_crashing(monkeypatch: pyt
     test_img = b"corrupted-receipt-image"
 
     with Session(engine) as session:
-        receipt = extractor.extract_document(test_img, source_file="corrupted.png", session=session)
+        receipt = extractor.extract_document(
+            test_img, source_file="corrupted.png", session=session
+        )
 
         # Extraction must not crash; status must be FAILED
         assert receipt.extraction_status == "FAILED"
@@ -274,15 +288,29 @@ def test_extractor_second_failure_marks_failed_without_crashing(monkeypatch: pyt
 
 def test_vendor_key_deterministic_formatting() -> None:
     """Test compute_vendor_key formats lowercase alphanumeric + dash and uppercase GSTIN or nogstin."""
-    assert compute_vendor_key("Aravali Stationers", "08AAAFA1234B1ZC") == "aravali-stationers|08AAAFA1234B1ZC"
-    assert compute_vendor_key("Pink  City   Fuels", "08aaacp5678c1zd") == "pink-city-fuels|08AAACP5678C1ZD"
-    assert compute_vendor_key("DeskCraft Furniture Pvt. Ltd.", "29AAACD9012L1ZI") == "deskcraft-furniture|29AAACD9012L1ZI"
-    assert compute_vendor_key("Shield Health Insurance Co. Ltd.", "27AAACS5678G1Z2") == "shield-health-insurance|27AAACS5678G1Z2"
+    assert (
+        compute_vendor_key("Aravali Stationers", "08AAAFA1234B1ZC")
+        == "aravali-stationers|08AAAFA1234B1ZC"
+    )
+    assert (
+        compute_vendor_key("Pink  City   Fuels", "08aaacp5678c1zd")
+        == "pink-city-fuels|08AAACP5678C1ZD"
+    )
+    assert (
+        compute_vendor_key("DeskCraft Furniture Pvt. Ltd.", "29AAACD9012L1ZI")
+        == "deskcraft-furniture|29AAACD9012L1ZI"
+    )
+    assert (
+        compute_vendor_key("Shield Health Insurance Co. Ltd.", "27AAACS5678G1Z2")
+        == "shield-health-insurance|27AAACS5678G1Z2"
+    )
     assert compute_vendor_key("Local Tea Stall", None) == "local-tea-stall|nogstin"
     assert compute_vendor_key(None, None) == "unknown|nogstin"
 
 
-def test_kimi_provider_backoff_retry_on_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_kimi_provider_backoff_retry_on_rate_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """KimiProvider retries with exponential backoff on HTTP 429 RateLimitError."""
     monkeypatch.setattr("time.sleep", lambda s: None)
 
@@ -295,12 +323,17 @@ def test_kimi_provider_backoff_retry_on_rate_limit(monkeypatch: pytest.MonkeyPat
             raise RateLimitError(
                 message="Rate limit exceeded",
                 response=httpx.Response(
-                    429, request=httpx.Request("POST", "https://api.moonshot.cn/v1/chat/completions")
+                    429,
+                    request=httpx.Request(
+                        "POST", "https://api.moonshot.cn/v1/chat/completions"
+                    ),
                 ),
                 body={"error": "Rate limit"},
             )
         mock_resp = MagicMock()
-        mock_resp.choices = [MagicMock(message=MagicMock(content=json.dumps({"doc_type": "receipt"})))]
+        mock_resp.choices = [
+            MagicMock(message=MagicMock(content=json.dumps({"doc_type": "receipt"})))
+        ]
         mock_resp.usage = MagicMock(prompt_tokens=50, completion_tokens=25)
         return mock_resp
 
@@ -318,4 +351,3 @@ def test_kimi_provider_semaphore_concurrency() -> None:
     """Verify semaphore of 4 limits in-flight requests."""
     provider = KimiProvider(client=MagicMock())
     assert provider.semaphore._value == 4
-

@@ -186,13 +186,15 @@ def test_audit_events_append_only_trigger(repo: Repository):
     assert created.id == "evt:01"
 
     # Attempting to UPDATE an audit event must fail due to trigger
-    with pytest.raises((IntegrityError, OperationalError), match="append-only: UPDATE forbidden"):
+    with pytest.raises(
+        (IntegrityError, OperationalError), match="append-only: UPDATE forbidden"
+    ):
         repo.session.execute(
             text("UPDATE audit_events SET action = 'MUTATED' WHERE id = 'evt:01'")
         )
 
     # Attempting to DELETE an audit event must fail due to trigger
-    with pytest.raises((IntegrityError, OperationalError), match="append-only: DELETE forbidden"):
-        repo.session.execute(
-            text("DELETE FROM audit_events WHERE id = 'evt:01'")
-        )
+    with pytest.raises(
+        (IntegrityError, OperationalError), match="append-only: DELETE forbidden"
+    ):
+        repo.session.execute(text("DELETE FROM audit_events WHERE id = 'evt:01'"))
