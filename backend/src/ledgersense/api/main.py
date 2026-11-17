@@ -426,6 +426,17 @@ def decide_risk_flag(
     }
 
 
+@app.post("/api/v1/runs/{run_id}/flags/{flag_id}/decision")
+def decide_risk_flag_scoped(
+    run_id: str,
+    flag_id: str,
+    payload: DecisionRequest,
+    session: DbSession,
+) -> dict[str, Any]:
+    """Scoped alias for /api/v1/flags/{flag_id}/decision allowing run_id in URL path."""
+    return decide_risk_flag(flag_id=flag_id, payload=payload, session=session)
+
+
 @app.post("/api/v1/runs/{run_id}/commit")
 def commit_run(
     run_id: str,
@@ -636,8 +647,14 @@ def get_egress_log(
                 "ts": r.ts.isoformat(),
                 "file_hash": r.file_hash,
                 "bytes": r.bytes,
+                "bytes_sent": r.bytes,
                 "model_id": r.model_id,
+                "model": r.model_id,
                 "masked": r.masked,
+                "pii_masked": r.masked,
+                "doc_id": r.file_hash[:12] if r.file_hash else r.id,
+                "narration": f"Perception extraction for {r.file_hash[:8] if r.file_hash else r.id}",
+                "est_cost": "0.005",
             }
             for r in records
         ],
