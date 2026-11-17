@@ -70,7 +70,9 @@ def balanced_journal_entry_strategy(draw: st.DrawFn) -> JournalEntry:
         lines = [
             JournalLine(account_code=exp_acct1, debit=amt1, credit=Decimal("0.00")),
             JournalLine(account_code=exp_acct2, debit=amt2, credit=Decimal("0.00")),
-            JournalLine(account_code=credit_acct, debit=Decimal("0.00"), credit=total_credit),
+            JournalLine(
+                account_code=credit_acct, debit=Decimal("0.00"), credit=total_credit
+            ),
         ]
     else:
         lines = [
@@ -116,8 +118,14 @@ def test_journal_entry_rejects_unbalanced_lines() -> None:
             entry_date=date(2025, 6, 1),
             narration="Unbalanced test entry",
             lines=[
-                JournalLine(account_code=EXP_OFFICE, debit=Decimal("100.00"), credit=Decimal("0.00")),
-                JournalLine(account_code=BANK, debit=Decimal("0.00"), credit=Decimal("90.00")),
+                JournalLine(
+                    account_code=EXP_OFFICE,
+                    debit=Decimal("100.00"),
+                    credit=Decimal("0.00"),
+                ),
+                JournalLine(
+                    account_code=BANK, debit=Decimal("0.00"), credit=Decimal("90.00")
+                ),
             ],
         )
 
@@ -130,7 +138,11 @@ def test_journal_entry_rejects_single_line() -> None:
             entry_date=date(2025, 6, 1),
             narration="Single line test entry",
             lines=[
-                JournalLine(account_code=EXP_OFFICE, debit=Decimal("50.00"), credit=Decimal("50.00")),
+                JournalLine(
+                    account_code=EXP_OFFICE,
+                    debit=Decimal("50.00"),
+                    credit=Decimal("50.00"),
+                ),
             ],
         )
 
@@ -170,7 +182,11 @@ def in_memory_db_session():
 
 
 def test_audit_log_append_and_payload_hash(in_memory_db_session: Session) -> None:
-    payload = {"status": "APPROVED", "auditor": "auditor-a", "reason": "Verified genuine invoice"}
+    payload = {
+        "status": "APPROVED",
+        "auditor": "auditor-a",
+        "reason": "Verified genuine invoice",
+    }
     hash1 = compute_payload_hash(payload)
     hash2 = compute_payload_hash(payload)
     assert hash1 == hash2  # Deterministic hash
@@ -205,13 +221,19 @@ def test_audit_log_immutability_triggers(in_memory_db_session: Session) -> None:
     append_audit(evt, session=in_memory_db_session)
 
     # SQLite trigger blocks UPDATE
-    with pytest.raises((IntegrityError, OperationalError), match="append-only: UPDATE forbidden"):
+    with pytest.raises(
+        (IntegrityError, OperationalError), match="append-only: UPDATE forbidden"
+    ):
         in_memory_db_session.execute(
-            text("UPDATE audit_events SET action = 'ALTERED' WHERE id = 'evt:test-0002'")
+            text(
+                "UPDATE audit_events SET action = 'ALTERED' WHERE id = 'evt:test-0002'"
+            )
         )
 
     # SQLite trigger blocks DELETE
-    with pytest.raises((IntegrityError, OperationalError), match="append-only: DELETE forbidden"):
+    with pytest.raises(
+        (IntegrityError, OperationalError), match="append-only: DELETE forbidden"
+    ):
         in_memory_db_session.execute(
             text("DELETE FROM audit_events WHERE id = 'evt:test-0002'")
         )

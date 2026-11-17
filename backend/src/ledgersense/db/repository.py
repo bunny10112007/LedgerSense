@@ -187,7 +187,9 @@ class Repository:
                 score=m.score,
                 kind=m.kind,
                 date_delta_days=m.date_delta_days,
-                amount_delta=Decimal(m.amount_delta) if m.amount_delta is not None else None,
+                amount_delta=Decimal(m.amount_delta)
+                if m.amount_delta is not None
+                else None,
             )
             for m in records
         ]
@@ -220,7 +222,9 @@ class Repository:
             statement = statement.where(RiskFlagRecord.status == status)
         return list(self.session.exec(statement).all())
 
-    def get_domain_risk_flags(self, run_id: str, status: str | None = None) -> list[RiskFlag]:
+    def get_domain_risk_flags(
+        self, run_id: str, status: str | None = None
+    ) -> list[RiskFlag]:
         records = self.get_risk_flags(run_id, status=status)
         return [
             RiskFlag(
@@ -289,13 +293,17 @@ class Repository:
         return list(self.session.exec(statement).all())
 
     def clear_journal_entries(self, run_id: str) -> None:
-        entries = list(self.session.exec(
-            select(JournalEntryRecord).where(JournalEntryRecord.run_id == run_id)
-        ).all())
+        entries = list(
+            self.session.exec(
+                select(JournalEntryRecord).where(JournalEntryRecord.run_id == run_id)
+            ).all()
+        )
         for e in entries:
-            lines = list(self.session.exec(
-                select(JournalLineRecord).where(JournalLineRecord.entry_id == e.id)
-            ).all())
+            lines = list(
+                self.session.exec(
+                    select(JournalLineRecord).where(JournalLineRecord.entry_id == e.id)
+                ).all()
+            )
             for line in lines:
                 self.session.delete(line)
             self.session.delete(e)
@@ -307,9 +315,13 @@ class Repository:
         records = self.get_journal_entries(run_id, status=status)
         entries: list[JournalEntry] = []
         for rec in records:
-            lines_records = list(self.session.exec(
-                select(JournalLineRecord).where(JournalLineRecord.entry_id == rec.id)
-            ).all())
+            lines_records = list(
+                self.session.exec(
+                    select(JournalLineRecord).where(
+                        JournalLineRecord.entry_id == rec.id
+                    )
+                ).all()
+            )
             lines = [
                 JournalLine(
                     account_code=l.account_code,

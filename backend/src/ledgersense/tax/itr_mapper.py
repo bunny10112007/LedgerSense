@@ -55,7 +55,11 @@ def build_deductions(
 
     # Filter to COMMITTED entries if available, otherwise non-rejected entries
     committed = [e for e in entries if e.status == "COMMITTED"]
-    target_entries = committed if committed else [e for e in entries if getattr(e, "status", "") != "REJECTED"]
+    target_entries = (
+        committed
+        if committed
+        else [e for e in entries if getattr(e, "status", "") != "REJECTED"]
+    )
 
     # Sum debit amounts on tagged entries
     claimed_80c = Decimal("0.00")

@@ -88,7 +88,9 @@ def test_golden_journal_and_statements(monkeypatch: pytest.MonkeyPatch) -> None:
             assert e.status == "DRAFT"
 
     # Gate rule: commit_entries MUST block with ValueError while HIGH flags are OPEN
-    with pytest.raises(ValueError, match="Gate Rule Blocked.*HIGH severity risk flags remain OPEN"):
+    with pytest.raises(
+        ValueError, match="Gate Rule Blocked.*HIGH severity risk flags remain OPEN"
+    ):
         commit_entries(draft_entries, flags)
 
     # 6. Simulate Auditor Decisions on the 4 HIGH Flags
@@ -157,8 +159,12 @@ def test_golden_journal_and_statements(monkeypatch: pytest.MonkeyPatch) -> None:
         assert ce.status == "COMMITTED"
 
     committed_rcpt_ids = {e.source_receipt_id for e in committed_entries}
-    assert "rcpt:G06" not in committed_rcpt_ids, "G06 rejected duplicate must be excluded from committed books"
-    assert "rcpt:G07" not in committed_rcpt_ids, "G07 rejected out-of-period must be excluded from committed books"
+    assert "rcpt:G06" not in committed_rcpt_ids, (
+        "G06 rejected duplicate must be excluded from committed books"
+    )
+    assert "rcpt:G07" not in committed_rcpt_ids, (
+        "G07 rejected out-of-period must be excluded from committed books"
+    )
 
     # 8. Check ITC blocked / gross expense bookings on G04, G12, and G10
     g04_entry = next(e for e in committed_entries if e.source_receipt_id == "rcpt:G04")
@@ -170,23 +176,33 @@ def test_golden_journal_and_statements(monkeypatch: pytest.MonkeyPatch) -> None:
         (g12_entry, Decimal("5900.00")),
         (g10_entry, Decimal("23600.00")),
     ]:
-        assert len(entry.lines) == 2, f"Gross booked entry should have exactly 2 lines, got {len(entry.lines)}"
+        assert len(entry.lines) == 2, (
+            f"Gross booked entry should have exactly 2 lines, got {len(entry.lines)}"
+        )
         debit_line = next(l for l in entry.lines if l.debit > Decimal("0.00"))
         credit_line = next(l for l in entry.lines if l.credit > Decimal("0.00"))
         assert debit_line.debit == expected_gross
         assert credit_line.credit == expected_gross
         # Zero Input GST
-        gst_lines = [l for l in entry.lines if l.account_code in (INPUT_CGST, INPUT_SGST, INPUT_IGST)]
+        gst_lines = [
+            l
+            for l in entry.lines
+            if l.account_code in (INPUT_CGST, INPUT_SGST, INPUT_IGST)
+        ]
         assert len(gst_lines) == 0
 
     # 9. Verify Deduction Tagging on G08 and G11
     g08_entry = next(e for e in committed_entries if e.source_receipt_id == "rcpt:G08")
     assert g08_entry.deduction_tag == "80D"
-    assert sum(l.debit for l in g08_entry.lines) == Decimal(answer_key["deductions"]["80D_if_g07_rejected"]["claimed"])
+    assert sum(l.debit for l in g08_entry.lines) == Decimal(
+        answer_key["deductions"]["80D_if_g07_rejected"]["claimed"]
+    )
 
     g11_entry = next(e for e in committed_entries if e.source_receipt_id == "rcpt:G11")
     assert g11_entry.deduction_tag == "80C"
-    assert sum(l.debit for l in g11_entry.lines) == Decimal(answer_key["deductions"]["80C"]["claimed"])
+    assert sum(l.debit for l in g11_entry.lines) == Decimal(
+        answer_key["deductions"]["80C"]["claimed"]
+    )
 
     # 10. Compute and verify Trial Balance
     tb = trial_balance(committed_entries)

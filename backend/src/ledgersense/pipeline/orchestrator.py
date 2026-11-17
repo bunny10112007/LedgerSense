@@ -1,226 +1,17 @@
 from __future__ import annotations
 
-<<<<<<< HEAD
 import logging
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
+from uuid import uuid4
 
 from sqlmodel import Session, select
 
-from ledgersense.core.config import settings
-from ledgersense.db.models import (
-    BankLineRecord,
-    DocumentRecord,
-    MatchRecord,
-    ReceiptRecord,
-    RunRecord,
-)
-from ledgersense.db.repository import Repository
-from ledgersense.domain.models import BankLine, Match, Receipt, RunConfig, RunStatus
-from ledgersense.extraction.extractor import ReceiptExtractor
-from ledgersense.matching.matcher import match as match_receipts_to_bank
-from ledgersense.pipeline.adapters import (
-    build_draft_journal_entries,
-    detect_risk_flags,
-    validate_gstin,
-)
-from ledgersense.pipeline.state_machine import transition_run_status
-
-logger = logging.getLogger(__name__)
-
-
-def process_run(run_id: str, session: Session) -> RunStatus:
-    """Execute complete deterministic pipeline for a run matching Section 4 & 7."""
-    run = session.get(RunRecord, run_id)
-    if not run:
-        raise ValueError(f"Run {run_id} not found")
-
-    cfg = RunConfig.model_validate_json(run.config_json)
-    repo = Repository(session)
-
-    # 1. Extraction Stage: CREATED -> EXTRACTED
-    if run.status == "CREATED":
-        transition_run_status(run_id, "EXTRACTED", session)
-        documents = list(
-            session.exec(
-                select(DocumentRecord).where(DocumentRecord.run_id == run_id)
-            ).all()
-        )
-        extractor = ReceiptExtractor()
-        extracted_receipts: list[Receipt] = []
-
-        safe_run_dir = run_id.replace(":", "_")
-        uploads_dir = settings.uploads_dir / safe_run_dir
-        golden_receipts_dir = settings.golden_dir / "receipts"
-
-        for idx, doc in enumerate(documents):
-            # Locate file on disk: check uploads dir, then golden receipts dir, then raw filename
-            candidate_paths = [
-                uploads_dir / doc.filename,
-                settings.uploads_dir / run_id / doc.filename,
-                golden_receipts_dir / doc.filename,
-                Path(doc.filename),
-            ]
-            file_path = next((p for p in candidate_paths if p.exists()), None)
-            if not file_path:
-                logger.error("Document file not found for %s: %s", doc.id, doc.filename)
-                continue
-
-            stem = file_path.stem.lower()
-            rcpt_code = ("G" + stem[1:]) if stem.startswith("g") else f"{idx + 1:04d}"
-            rcpt_id = f"rcpt:{rcpt_code}"
-
-            receipt = extractor.extract_document(
-                path=file_path,
-                receipt_id=rcpt_id,
-                source_file=doc.filename,
-                run_id=run_id,
-                session=session,
-            )
-            extracted_receipts.append(receipt)
-            doc.extraction_status = receipt.extraction_status
-            session.add(doc)
-
-        if extracted_receipts:
-            repo.save_receipts(extracted_receipts)
-        session.commit()
-
-    # 2. Validation Stage: EXTRACTED -> VALIDATED
-    run = session.get(RunRecord, run_id)
-    assert run is not None
-    if run.status == "EXTRACTED":
-        transition_run_status(run_id, "VALIDATED", session)
-        receipt_records = list(
-            session.exec(
-                select(ReceiptRecord).where(ReceiptRecord.run_id == run_id)
-            ).all()
-        )
-        for r_rec in receipt_records:
-            r = Receipt.model_validate_json(r_rec.payload_json)
-            if r.vendor_gstin:
-                gstin_res = validate_gstin(r.vendor_gstin)
-                if not gstin_res.ok and gstin_res.reason:
-                    r.check_messages.append(f"GSTIN validation: {gstin_res.reason}")
-                    r_rec.payload_json = r.model_dump_json()
-                    session.add(r_rec)
-        session.commit()
-
-    # 3. Matching Stage: VALIDATED -> MATCHED
-    run = session.get(RunRecord, run_id)
-    assert run is not None
-    if run.status == "VALIDATED":
-        transition_run_status(run_id, "MATCHED", session)
-        receipt_records = list(
-            session.exec(
-                select(ReceiptRecord).where(ReceiptRecord.run_id == run_id)
-            ).all()
-        )
-        receipts = [
-            Receipt.model_validate_json(rec.payload_json) for rec in receipt_records
-        ]
-
-        bank_records = list(
-            session.exec(
-                select(BankLineRecord).where(BankLineRecord.run_id == run_id)
-            ).all()
-        )
-        bank_lines = [
-            BankLine(
-                id=b.id,
-                run_id=b.run_id,
-                txn_date=b.txn_date,
-                narration=b.narration,
-                debit=b.debit,  # type: ignore[arg-type]
-                credit=b.credit,  # type: ignore[arg-type]
-                balance=b.balance,  # type: ignore[arg-type]
-                ref_no=b.ref_no,
-            )
-            for b in bank_records
-        ]
-
-        matches = match_receipts_to_bank(receipts, bank_lines, cfg)
-        repo.save_matches(matches)
-        session.commit()
-
-    # 4. Risk Detection Stage: MATCHED -> RISK_DONE
-    run = session.get(RunRecord, run_id)
-    assert run is not None
-    if run.status == "MATCHED":
-        transition_run_status(run_id, "RISK_DONE", session)
-        receipt_records = list(
-            session.exec(
-                select(ReceiptRecord).where(ReceiptRecord.run_id == run_id)
-            ).all()
-        )
-        receipts = [
-            Receipt.model_validate_json(rec.payload_json) for rec in receipt_records
-        ]
-
-        bank_records = list(
-            session.exec(
-                select(BankLineRecord).where(BankLineRecord.run_id == run_id)
-            ).all()
-        )
-        bank_lines = [
-            BankLine(
-                id=b.id,
-                run_id=b.run_id,
-                txn_date=b.txn_date,
-                narration=b.narration,
-                debit=b.debit,  # type: ignore[arg-type]
-                credit=b.credit,  # type: ignore[arg-type]
-                balance=b.balance,  # type: ignore[arg-type]
-                ref_no=b.ref_no,
-            )
-            for b in bank_records
-        ]
-
-        match_records = list(
-            session.exec(select(MatchRecord).where(MatchRecord.run_id == run_id)).all()
-        )
-        matches = [
-            Match(
-                id=m.id,
-                run_id=m.run_id,
-                receipt_id=m.receipt_id,
-                bank_line_id=m.bank_line_id,
-                score=m.score,
-                kind=m.kind,  # type: ignore[arg-type]
-                date_delta_days=m.date_delta_days,
-                amount_delta=m.amount_delta,  # type: ignore[arg-type]
-            )
-            for m in match_records
-        ]
-
-        flags = detect_risk_flags(receipts, bank_lines, matches, cfg, session)
-        repo.save_risk_flags(flags)
-
-        # Build initial balanced DRAFT journal entries
-        entries = build_draft_journal_entries(run_id, receipts, bank_lines, flags)
-        repo.save_journal_entries(entries)
-        session.commit()
-
-    # 5. Review Stage: RISK_DONE -> AWAITING_REVIEW or APPROVED
-    run = session.get(RunRecord, run_id)
-    assert run is not None
-    if run.status == "RISK_DONE":
-        flags = repo.get_risk_flags(run_id)
-        has_open_high = any(f.severity == "HIGH" and f.status == "OPEN" for f in flags)
-        if has_open_high:
-            transition_run_status(run_id, "AWAITING_REVIEW", session)
-            return "AWAITING_REVIEW"
-        transition_run_status(run_id, "APPROVED", session)
-        return "APPROVED"
-
-    return run.status  # type: ignore[return-value]
-=======
-from datetime import UTC, datetime
-from pathlib import Path
-from uuid import uuid4
-
-from sqlmodel import Session
-
 from ledgersense.accounting.journal import build_entries, commit_entries
 from ledgersense.audit.log import compute_payload_hash
+from ledgersense.core.config import settings
+from ledgersense.db.models import DocumentRecord
 from ledgersense.db.repository import Repository
 from ledgersense.domain.models import AuditEvent, JournalEntry, Receipt, RiskFlag, Run
 from ledgersense.extraction.extractor import ReceiptExtractor
@@ -228,8 +19,11 @@ from ledgersense.matching.bank_csv import parse as parse_bank_csv
 from ledgersense.matching.matcher import match
 from ledgersense.pipeline.gate import can_commit, check_run_gate
 from ledgersense.pipeline.state_machine import transition_run
+from ledgersense.tax.gstin import validate_gstin
 from ledgersense.tax.risk_detectors import detect_all
 from ledgersense.tax.rules_engine import load_rules
+
+logger = logging.getLogger(__name__)
 
 
 class GateBlockedError(ValueError):
@@ -244,38 +38,87 @@ class GateBlockedError(ValueError):
 
 
 def process_run(
-    session: Session,
-    run_id: str,
+    run_id: str | Session | None = None,
+    session: Session | str | None = None,
     receipt_paths: list[Path] | None = None,
     bank_csv_path: Path | None = None,
+    *args: Any,
+    **kwargs: Any,
 ) -> Run:
-    """Execute the end-to-end ingestion and reconciliation pipeline for a run.
+    """Execute complete deterministic pipeline for a run matching Section 4 & 7.
 
-    Pipeline milestones:
-    CREATED -> EXTRACTED -> VALIDATED -> MATCHED -> RISK_DONE -> AWAITING_REVIEW | APPROVED
+    Supports both (run_id, session) and (session, run_id) argument conventions,
+    as well as positional and keyword calls.
     """
+    if isinstance(run_id, Session):
+        session, run_id = run_id, session
+    elif run_id is None and "session" in kwargs:
+        session = kwargs.pop("session")
+    if isinstance(session, str) and not isinstance(run_id, str):
+        session, run_id = run_id, session
+
+    if not isinstance(run_id, str) or not isinstance(session, Session):
+        raise TypeError(
+            f"process_run requires valid run_id (str) and session (Session), got run_id={type(run_id)}, session={type(session)}"
+        )
+
     repo = Repository(session)
     run = repo.get_domain_run(run_id)
     if not run:
         raise ValueError(f"Run '{run_id}' not found")
 
+    cfg = run.config
+
     try:
         # Step 1: Document Extraction & Validation
         receipts: list[Receipt] = []
+        files_to_extract: list[Path] = []
         if receipt_paths:
+            files_to_extract = list(receipt_paths)
+        else:
+            documents = repo.get_documents(run_id)
+            safe_run_dir = run_id.replace(":", "_")
+            uploads_dir = settings.uploads_dir / safe_run_dir
+            golden_receipts_dir = settings.golden_dir / "receipts"
+
+            for doc in documents:
+                candidate_paths = [
+                    uploads_dir / doc.filename,
+                    settings.uploads_dir / run_id / doc.filename,
+                    golden_receipts_dir / doc.filename,
+                    Path(doc.filename),
+                ]
+                file_path = next((p for p in candidate_paths if p.exists()), None)
+                if file_path:
+                    files_to_extract.append(file_path)
+                else:
+                    logger.error("Document file not found for %s: %s", doc.id, doc.filename)
+
+        if files_to_extract:
             extractor = ReceiptExtractor()
-            for p in sorted(receipt_paths):
-                stem = p.stem.lower()
-                rcpt_code = ("G" + stem[1:]) if stem.startswith("g") else stem
+            for idx, file_path in enumerate(sorted(files_to_extract)):
+                stem = file_path.stem.lower()
+                rcpt_code = ("G" + stem[1:]) if stem.startswith("g") else f"{idx + 1:04d}"
                 rcpt_id = f"rcpt:{rcpt_code}"
+
                 receipt = extractor.extract_document(
-                    path=p,
+                    path=file_path,
                     receipt_id=rcpt_id,
-                    source_file=f"receipts/{p.name}",
+                    source_file=f"receipts/{file_path.name}",
                     run_id=run_id,
                     session=session,
                 )
                 receipts.append(receipt)
+
+                # Update document status if matching DocumentRecord exists
+                doc_rec = session.exec(
+                    select(DocumentRecord)
+                    .where(DocumentRecord.run_id == run_id)
+                    .where(DocumentRecord.filename == file_path.name)
+                ).first()
+                if doc_rec:
+                    doc_rec.extraction_status = receipt.extraction_status
+                    session.add(doc_rec)
 
                 # Record extraction audit event
                 evt = AuditEvent(
@@ -293,20 +136,27 @@ def process_run(
                 repo.append_audit_event(evt)
 
             repo.save_receipts(receipts)
+            session.commit()
         else:
             receipts = repo.get_domain_receipts(run_id)
 
         transition_run(session, run_id, "EXTRACTED")
+
+        # Validate GSTINs
+        for r in receipts:
+            if r.vendor_gstin:
+                validate_gstin(r.vendor_gstin)
+
         transition_run(session, run_id, "VALIDATED")
 
         # Step 2: Bank Statement Ingestion & Matching
-        if bank_csv_path:
+        if bank_csv_path and bank_csv_path.exists():
             bank_lines = parse_bank_csv(bank_csv_path, run_id=run_id)
             repo.save_bank_lines(bank_lines)
         else:
             bank_lines = repo.get_domain_bank_lines(run_id)
 
-        matches = match(receipts=receipts, bank_lines=bank_lines, cfg=run.config)
+        matches = match(receipts=receipts, bank_lines=bank_lines, cfg=cfg)
         repo.save_matches(matches)
         transition_run(session, run_id, "MATCHED")
 
@@ -316,7 +166,7 @@ def process_run(
             receipts=receipts,
             matches=matches,
             bank_lines=bank_lines,
-            cfg=run.config,
+            cfg=cfg,
             rules=rules,
         )
         repo.save_risk_flags(flags)
@@ -327,7 +177,7 @@ def process_run(
             receipts=receipts,
             matches=matches,
             flags=flags,
-            cfg=run.config,
+            cfg=cfg,
             bank_lines=bank_lines,
         )
         repo.save_journal_entries(entries)
@@ -351,7 +201,6 @@ def process_run(
         return final_run
 
     except Exception as exc:
-        # On unrecoverable error, transition run to FAILED and re-raise
         try:
             current_run = repo.get_run(run_id)
             if current_run and current_run.status != "FAILED":
@@ -438,4 +287,3 @@ def commit_run(
     repo.append_audit_event(evt)
 
     return committed_entries
->>>>>>> 002af4b0f998fc47ba702aa7c12154a99ecd8744

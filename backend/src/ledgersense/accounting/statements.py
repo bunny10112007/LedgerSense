@@ -83,19 +83,23 @@ def profit_and_loss(entries: list[JournalEntry]) -> PnL:
 
             if is_income_account(acct):
                 # Income increases with credit
-                income_dict[acct] += (line.credit - line.debit)
+                income_dict[acct] += line.credit - line.debit
             elif is_expense_account(acct):
                 # Expenses increase with debit
-                expense_dict[acct] += (line.debit - line.credit)
+                expense_dict[acct] += line.debit - line.credit
             else:
                 # Default: accounts starting with 5 are expenses, 4 are income
                 if acct.startswith("4"):
-                    income_dict[acct] += (line.credit - line.debit)
+                    income_dict[acct] += line.credit - line.debit
                 else:
-                    expense_dict[acct] += (line.debit - line.credit)
+                    expense_dict[acct] += line.debit - line.credit
 
-    formatted_income = {k: quantize_money(v) for k, v in income_dict.items() if v != Decimal("0.00")}
-    formatted_expenses = {k: quantize_money(v) for k, v in expense_dict.items() if v != Decimal("0.00")}
+    formatted_income = {
+        k: quantize_money(v) for k, v in income_dict.items() if v != Decimal("0.00")
+    }
+    formatted_expenses = {
+        k: quantize_money(v) for k, v in expense_dict.items() if v != Decimal("0.00")
+    }
 
     total_income = quantize_money(sum(formatted_income.values(), Decimal("0.00")))
     total_expenses = quantize_money(sum(formatted_expenses.values(), Decimal("0.00")))

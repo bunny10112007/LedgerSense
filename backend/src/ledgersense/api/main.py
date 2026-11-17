@@ -13,6 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
+from ledgersense.accounting.journal import build_entries
+from ledgersense.accounting.statements import profit_and_loss, trial_balance
 from ledgersense.api.errors import (
     APIError,
     GateBlockedError,
@@ -23,7 +25,6 @@ from ledgersense.api.errors import (
 from ledgersense.core.config import settings
 from ledgersense.db.models import (
     AuditEventRecord,
-    BankLineRecord,
     DocumentRecord,
     EgressLogRecord,
     JournalEntryRecord,
@@ -36,22 +37,21 @@ from ledgersense.db.models import (
 from ledgersense.db.repository import Repository
 from ledgersense.db.session import get_session
 from ledgersense.domain.models import (
-    BankLine,
-    Receipt,
-    RiskFlag,
     RunConfig,
 )
 from ledgersense.matching.bank_csv import parse as parse_bank_csv
-from ledgersense.pipeline.adapters import (
-    build_deductions_schedule,
-    build_draft_journal_entries,
-    build_itr_draft,
-    calculate_pnl,
-    calculate_trial_balance,
+from ledgersense.pipeline.gate import record_flag_decision
+from ledgersense.pipeline.orchestrator import (
+    GateBlockedError as OrchestratorGateBlockedError,
 )
-from ledgersense.pipeline.gate import can_commit
-from ledgersense.pipeline.orchestrator import process_run
-from ledgersense.pipeline.state_machine import transition_run_status
+from ledgersense.pipeline.orchestrator import (
+    commit_run as orchestrator_commit_run,
+)
+from ledgersense.pipeline.orchestrator import (
+    process_run,
+)
+from ledgersense.tax.itr_mapper import build_deductions, build_itr3_draft
+from ledgersense.tax.rules_engine import load_rules
 
 app = FastAPI(title="LedgerSense API", version="0.1.0")
 
@@ -259,8 +259,9 @@ def process_pipeline(
     if not run:
         raise NotFoundError(f"Run {run_id} not found")
 
-    final_status = process_run(run_id, session)
-    return {"status": final_status}
+    final_run = process_run(run_id, session)
+    status_str = final_run.status if hasattr(final_run, "status") else str(final_run)
+    return {"status": status_str}
 
 
 @app.get("/api/v1/runs/{run_id}")
@@ -377,146 +378,51 @@ def decide_risk_flag(
     session: DbSession,
 ) -> dict[str, Any]:
     """Human auditor decision on a risk flag with min 10-char reason and audit event logging."""
-    if payload.auditor_id not in ("auditor-a", "auditor-b"):
-        raise InvalidAuditorDecisionError(
-            f"Invalid auditor_id '{payload.auditor_id}'. Must be 'auditor-a' or 'auditor-b'."
-        )
-    if len(payload.reason.strip()) < 10:
-        raise InvalidAuditorDecisionError(
-            "Decision reason must be at least 10 characters long."
-        )
-
     flag = session.get(RiskFlagRecord, flag_id)
     if not flag:
         raise NotFoundError(f"RiskFlag {flag_id} not found")
 
-    new_status = "APPROVED" if payload.decision.lower() == "approve" else "REJECTED"
-    flag.status = new_status
-    flag.decided_by = payload.auditor_id
-    flag.decision_reason = payload.reason
-    flag.decided_at = datetime.now(UTC)
-    session.add(flag)
-
-    # Write append-only AuditEvent
-    action = "FLAG_APPROVED" if new_status == "APPROVED" else "FLAG_REJECTED"
-    payload_hash = hashlib.sha256(
-        f"{flag_id}:{new_status}:{payload.reason}".encode()
-    ).hexdigest()
-    audit_event = AuditEventRecord(
-        id=f"evt:{uuid.uuid4().hex[:12]}",
-        ts=datetime.now(UTC),
-        run_id=flag.run_id,
-        actor=payload.auditor_id,
-        action=action,
-        entity_id=flag_id,
-        reason=payload.reason,
-        payload_hash=payload_hash,
-    )
-    session.add(audit_event)
-    session.commit()
-    session.refresh(flag)
-
-    # Re-evaluate run state: if all HIGH flags resolved, transition AWAITING_REVIEW -> APPROVED
-    all_flags = list(
-        session.exec(
-            select(RiskFlagRecord).where(RiskFlagRecord.run_id == flag.run_id)
-        ).all()
-    )
-    has_open_high = any(f.severity == "HIGH" and f.status == "OPEN" for f in all_flags)
-    run = session.get(RunRecord, flag.run_id)
-
-    if run and not has_open_high and run.status == "AWAITING_REVIEW":
-        transition_run_status(
-            flag.run_id,
-            "APPROVED",
-            session,
-            actor="system",
-            reason="All HIGH severity risk flags resolved by auditor sign-off",
+    try:
+        updated_flag = record_flag_decision(
+            session=session,
+            flag_id=flag_id,
+            auditor_id=payload.auditor_id,
+            decision=payload.decision,
+            reason=payload.reason,
         )
+    except ValueError as err:
+        raise InvalidAuditorDecisionError(str(err)) from err
 
-        # Rebuild/update draft journal entries to reflect rejected or approved out-of-period/duplicate receipts
-        receipt_records = list(
-            session.exec(
-                select(ReceiptRecord).where(ReceiptRecord.run_id == flag.run_id)
-            ).all()
+    # Rebuild draft journal entries to reflect decisions (excluding rejected vouchers)
+    repo = Repository(session)
+    receipts = repo.get_domain_receipts(flag.run_id)
+    matches = repo.get_domain_matches(flag.run_id)
+    flags = repo.get_domain_risk_flags(flag.run_id)
+    bank_lines = repo.get_domain_bank_lines(flag.run_id)
+    run_rec = session.get(RunRecord, flag.run_id)
+    if run_rec:
+        cfg = RunConfig.model_validate_json(run_rec.config_json)
+        new_entries = build_entries(
+            receipts=receipts,
+            matches=matches,
+            flags=flags,
+            cfg=cfg,
+            bank_lines=bank_lines,
         )
-        receipts = [
-            Receipt.model_validate_json(r.payload_json) for r in receipt_records
-        ]
-        bank_records = list(
-            session.exec(
-                select(BankLineRecord).where(BankLineRecord.run_id == flag.run_id)
-            ).all()
-        )
-        bank_lines = [
-            BankLine(
-                id=b.id,
-                run_id=b.run_id,
-                txn_date=b.txn_date,
-                narration=b.narration,
-                debit=Decimal(b.debit),
-                credit=Decimal(b.credit),
-                balance=Decimal(b.balance) if b.balance else None,
-                ref_no=b.ref_no,
-            )
-            for b in bank_records
-        ]
-        active_flags = [
-            RiskFlag(
-                id=f.id,
-                run_id=f.run_id,
-                rule_id=f.rule_id,
-                severity=f.severity,  # type: ignore[arg-type]
-                entity_ids=json.loads(f.entity_ids_json) if f.entity_ids_json else [],
-                legal_ref=f.legal_ref,
-                evidence=json.loads(f.evidence_json) if f.evidence_json else {},
-                suggested_action=f.suggested_action,
-                status=f.status,  # type: ignore[arg-type]
-                decided_by=f.decided_by,
-                decision_reason=f.decision_reason,
-                decided_at=f.decided_at,
-            )
-            for f in all_flags
-        ]
-        new_entries = build_draft_journal_entries(
-            flag.run_id, receipts, bank_lines, active_flags
-        )
-
-        # Delete old draft entries and store updated ones
-        old_entries = list(
-            session.exec(
-                select(JournalEntryRecord)
-                .where(JournalEntryRecord.run_id == flag.run_id)
-                .where(JournalEntryRecord.status == "DRAFT")
-            ).all()
-        )
-        old_entry_ids = [e.id for e in old_entries]
-        if old_entry_ids:
-            old_lines = list(
-                session.exec(
-                    select(JournalLineRecord).where(
-                        JournalLineRecord.entry_id.in_(old_entry_ids)
-                    )
-                ).all()
-            )
-            for ol in old_lines:
-                session.delete(ol)
-            for oe in old_entries:
-                session.delete(oe)
-            session.commit()
-
-        repo = Repository(session)
+        repo.clear_journal_entries(flag.run_id)
         repo.save_journal_entries(new_entries)
 
     return {
-        "id": flag.id,
-        "run_id": flag.run_id,
-        "rule_id": flag.rule_id,
-        "severity": flag.severity,
-        "status": flag.status,
-        "decided_by": flag.decided_by,
-        "decision_reason": flag.decision_reason,
-        "decided_at": flag.decided_at.isoformat() if flag.decided_at else None,
+        "id": updated_flag.id,
+        "run_id": updated_flag.run_id,
+        "rule_id": updated_flag.rule_id,
+        "severity": updated_flag.severity,
+        "status": updated_flag.status,
+        "decided_by": updated_flag.decided_by,
+        "decision_reason": updated_flag.decision_reason,
+        "decided_at": (
+            updated_flag.decided_at.isoformat() if updated_flag.decided_at else None
+        ),
     }
 
 
@@ -531,53 +437,21 @@ def commit_run(
     if not run:
         raise NotFoundError(f"Run {run_id} not found")
 
-    allowed, open_high_flags = can_commit(run_id, session)
-    if not allowed:
-        raise GateBlockedError(
-            message="Cannot commit while HIGH risk flags are open",
-            details={"open_high_flags": [f.model_dump() for f in open_high_flags]},
+    try:
+        committed = orchestrator_commit_run(
+            session=session,
+            run_id=run_id,
+            auditor_id=payload.auditor_id,
         )
-
-    # Transition eligible DRAFT journal entries to COMMITTED
-    draft_entries = list(
-        session.exec(
-            select(JournalEntryRecord)
-            .where(JournalEntryRecord.run_id == run_id)
-            .where(JournalEntryRecord.status == "DRAFT")
-        ).all()
-    )
-    for entry in draft_entries:
-        entry.status = "COMMITTED"
-        session.add(entry)
-
-    transition_run_status(
-        run_id,
-        "COMMITTED",
-        session,
-        actor=payload.auditor_id,
-        reason=f"Run committed and entries locked by {payload.auditor_id}",
-    )
-
-    payload_hash = hashlib.sha256(
-        f"{run_id}:COMMITTED:{len(draft_entries)}".encode()
-    ).hexdigest()
-    audit_event = AuditEventRecord(
-        id=f"evt:{uuid.uuid4().hex[:12]}",
-        ts=datetime.now(UTC),
-        run_id=run_id,
-        actor=payload.auditor_id,
-        action="RUN_COMMITTED",
-        entity_id=run_id,
-        reason=f"Committed {len(draft_entries)} journal entries",
-        payload_hash=payload_hash,
-    )
-    session.add(audit_event)
-    session.commit()
-
-    return {
-        "status": "COMMITTED",
-        "entries_committed": len(draft_entries),
-    }
+        return {
+            "status": "COMMITTED",
+            "entries_committed": len(committed),
+        }
+    except OrchestratorGateBlockedError as err:
+        raise GateBlockedError(
+            message=str(err),
+            details={"open_high_flags": [f.model_dump() for f in err.open_high_flags]},
+        ) from err
 
 
 # --- 5. Accounting & Statements ---
@@ -631,7 +505,11 @@ def get_trial_balance(
     session: DbSession,
 ) -> dict[str, Any]:
     """Calculate Trial Balance from committed entries."""
-    tb = calculate_trial_balance(run_id, session)
+    repo = Repository(session)
+    entries = repo.get_domain_journal_entries(run_id, status="COMMITTED")
+    if not entries:
+        entries = repo.get_domain_journal_entries(run_id)
+    tb = trial_balance(entries)
     return {
         "accounts": [row.model_dump() for row in tb.accounts],
         "total_debit": str(tb.total_debit),
@@ -646,7 +524,11 @@ def get_pnl(
     session: DbSession,
 ) -> dict[str, Any]:
     """Calculate Profit and Loss from committed entries."""
-    pnl = calculate_pnl(run_id, session)
+    repo = Repository(session)
+    entries = repo.get_domain_journal_entries(run_id, status="COMMITTED")
+    if not entries:
+        entries = repo.get_domain_journal_entries(run_id)
+    pnl = profit_and_loss(entries)
     return {
         "income": {k: str(v) for k, v in pnl.income.items()},
         "expenses": {k: str(v) for k, v in pnl.expenses.items()},
@@ -668,7 +550,12 @@ def get_deductions(
         raise NotFoundError(f"Run {run_id} not found")
 
     cfg = RunConfig.model_validate_json(run.config_json)
-    schedule = build_deductions_schedule(run_id, cfg, session)
+    repo = Repository(session)
+    entries = repo.get_domain_journal_entries(run_id, status="COMMITTED")
+    if not entries:
+        entries = repo.get_domain_journal_entries(run_id)
+    rules = load_rules()
+    schedule = build_deductions(entries=entries, rules=rules, cfg=cfg)
     return schedule.model_dump()
 
 
@@ -684,7 +571,12 @@ def get_itr_draft_route(
         raise NotFoundError(f"Run {run_id} not found")
 
     cfg = RunConfig.model_validate_json(run.config_json)
-    itr_draft = build_itr_draft(run_id, form, cfg, session)
+    repo = Repository(session)
+    entries = repo.get_domain_journal_entries(run_id, status="COMMITTED")
+    if not entries:
+        entries = repo.get_domain_journal_entries(run_id)
+    rules = load_rules()
+    itr_draft = build_itr3_draft(entries=entries, rules=rules, cfg=cfg)
     return itr_draft.model_dump()
 
 

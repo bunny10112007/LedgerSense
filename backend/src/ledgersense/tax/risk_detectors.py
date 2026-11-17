@@ -40,7 +40,9 @@ def _get_run_id(
 # --- 1. DUP_FARE / DUP_DOC Detector ---
 
 
-def detect_duplicates(receipts: list[Receipt], run_id: str = "run:default") -> list[RiskFlag]:
+def detect_duplicates(
+    receipts: list[Receipt], run_id: str = "run:default"
+) -> list[RiskFlag]:
     """Detect exact and near duplicate receipts.
 
     - Exact: two receipts share (vendor_key, total, invoice_date, invoice_no) when invoice_no present.
@@ -66,7 +68,10 @@ def detect_duplicates(receipts: list[Receipt], run_id: str = "run:default") -> l
 
             # Exact duplicate: matching invoice_no and invoice_date
             if rcpt.invoice_no and prev.invoice_no:
-                if rcpt.invoice_no.strip() == prev.invoice_no.strip() and rcpt.invoice_date == prev.invoice_date:
+                if (
+                    rcpt.invoice_no.strip() == prev.invoice_no.strip()
+                    and rcpt.invoice_date == prev.invoice_date
+                ):
                     duplicate_of = prev
                     dup_kind = "exact"
                     break
@@ -79,7 +84,9 @@ def detect_duplicates(receipts: list[Receipt], run_id: str = "run:default") -> l
                     break
 
         if duplicate_of:
-            is_fare = rcpt.doc_type == "fare" or "cab" in (rcpt.vendor_name or "").lower()
+            is_fare = (
+                rcpt.doc_type == "fare" or "cab" in (rcpt.vendor_name or "").lower()
+            )
             rule_id = "DUP_FARE" if is_fare else "DUP_DOC"
             severity: Severity = "HIGH" if is_fare else "MEDIUM"
             legal_ref = (
@@ -219,7 +226,11 @@ def detect_invalid_gstin(
     flags: list[RiskFlag] = []
 
     for rcpt in receipts:
-        tax_claimed = (rcpt.cgst or Decimal(0)) + (rcpt.sgst or Decimal(0)) + (rcpt.igst or Decimal(0))
+        tax_claimed = (
+            (rcpt.cgst or Decimal(0))
+            + (rcpt.sgst or Decimal(0))
+            + (rcpt.igst or Decimal(0))
+        )
 
         # Check if GSTIN present or tax claimed
         if rcpt.vendor_gstin:
@@ -280,7 +291,11 @@ def detect_blocked_itc(
     flags: list[RiskFlag] = []
 
     for rcpt in receipts:
-        tax_claimed = (rcpt.cgst or Decimal(0)) + (rcpt.sgst or Decimal(0)) + (rcpt.igst or Decimal(0))
+        tax_claimed = (
+            (rcpt.cgst or Decimal(0))
+            + (rcpt.sgst or Decimal(0))
+            + (rcpt.igst or Decimal(0))
+        )
         if tax_claimed <= Decimal("0.00"):
             continue  # No ITC claimed to block
 
@@ -292,7 +307,9 @@ def detect_blocked_itc(
         full_text = " ".join(text_parts).lower()
 
         for category in rules.gst.categories:
-            matched_keyword = next((kw for kw in category.keywords if kw.lower() in full_text), None)
+            matched_keyword = next(
+                (kw for kw in category.keywords if kw.lower() in full_text), None
+            )
             if matched_keyword:
                 flags.append(
                     RiskFlag(
@@ -307,7 +324,9 @@ def detect_blocked_itc(
                             "matched_keyword": matched_keyword,
                             "vendor_name": rcpt.vendor_name,
                             "tax_claimed": str(tax_claimed),
-                            "total": str(rcpt.total) if rcpt.total is not None else None,
+                            "total": str(rcpt.total)
+                            if rcpt.total is not None
+                            else None,
                             "reason": f"Blocked ITC under {category.ref} for {category.id.lower()}",
                         },
                         suggested_action="Book tax as expense; ITC = 0",
@@ -492,7 +511,9 @@ def detect_all(
     raw_flags.extend(detect_out_of_period(receipts, cfg=cfg, run_id=run_id))
 
     # 3. Cash limit
-    raw_flags.extend(detect_cash_limit(receipts, cfg=cfg, rules=effective_rules, run_id=run_id))
+    raw_flags.extend(
+        detect_cash_limit(receipts, cfg=cfg, rules=effective_rules, run_id=run_id)
+    )
 
     # 4. GSTIN validation
     raw_flags.extend(detect_invalid_gstin(receipts, run_id=run_id))
@@ -504,7 +525,9 @@ def detect_all(
     raw_flags.extend(detect_unmatched_receipts(matches, run_id=run_id))
 
     # 7. Unmatched bank debits
-    raw_flags.extend(detect_unmatched_bank(matches, bank_lines=bank_lines, run_id=run_id))
+    raw_flags.extend(
+        detect_unmatched_bank(matches, bank_lines=bank_lines, run_id=run_id)
+    )
 
     # 8. Arithmetic integrity
     raw_flags.extend(detect_arithmetic_mismatches(receipts, run_id=run_id))
@@ -524,8 +547,6 @@ def detect_all(
     # Renumber sequentially to canonical IDs: flag:0001, flag:0002, ...
     final_flags: list[RiskFlag] = []
     for idx, flag in enumerate(raw_flags, start=1):
-        final_flags.append(
-            flag.model_copy(update={"id": f"flag:{idx:04d}"})
-        )
+        final_flags.append(flag.model_copy(update={"id": f"flag:{idx:04d}"}))
 
     return final_flags
