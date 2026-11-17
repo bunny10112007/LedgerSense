@@ -235,3 +235,33 @@ export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
 }
+
+export interface EgressEntry {
+  id: string;
+  ts: string;
+  model: string;
+  bytes_sent: number;
+  est_cost: Money;
+  pii_masked: boolean;
+  doc_id?: string;
+  narration?: string;
+}
+
+export interface EgressResponse {
+  calls: number;
+  bytes: number;
+  est_cost: Money;
+  entries: EgressEntry[];
+}
+
+export interface FlagDecisionRequest {
+  auditor_id: 'auditor-a' | 'auditor-b' | string;
+  decision: 'approve' | 'reject';
+  reason: string;
+}
+
+export interface CommitResponse {
+  entries_committed?: number;
+  open_high_flags?: RiskFlag[];
+  message?: string;
+}
