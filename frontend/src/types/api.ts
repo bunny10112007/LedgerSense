@@ -173,7 +173,12 @@ export interface Run {
   regime: Regime;
   status: RunStatus;
   config: RunConfig;
-  created_at: string;
+  created_at?: string;
+  documents_total?: number;
+  receipts_extracted?: number;
+  matches_count?: number;
+  flags_count?: number;
+  open_high_flags?: number;
 }
 
 // Section 9 pure function response models
@@ -245,12 +250,17 @@ export interface EgressEntry {
   pii_masked: boolean;
   doc_id?: string;
   narration?: string;
+  file_hash?: string;
+  bytes?: number;
+  model_id?: string;
+  masked?: boolean;
 }
 
 export interface EgressResponse {
   calls: number;
   bytes: number;
   est_cost: Money;
+  bank_data_sent?: boolean;
   entries: EgressEntry[];
 }
 
@@ -261,6 +271,7 @@ export interface FlagDecisionRequest {
 }
 
 export interface CommitResponse {
+  status?: string;
   entries_committed?: number;
   open_high_flags?: RiskFlag[];
   message?: string;
